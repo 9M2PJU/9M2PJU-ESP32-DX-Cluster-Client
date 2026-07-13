@@ -6,7 +6,7 @@
 <title>9M2PJU ESP32 DX Cluster Client — Web Flasher</title>
 <meta name="description" content="Flash the 9M2PJU ESP32 DX Cluster Client firmware to your ESP32 board directly from your browser. No software install needed.">
 <meta property="og:title" content="9M2PJU ESP32 DX Cluster Client — Web Flasher">
-<meta property="og:description" content="Flash firmware to your ESP32 board directly from your browser. Supports 13 boards including LilyGO T-Display-S3, M5Stack, T-Watch, and more.">
+<meta property="og:description" content="Flash firmware to your ESP32 board directly from your browser. Supports 22 boards including LilyGO T-Display-S3, M5Stack, T-Watch, Heltec WiFi Kit/LoRa 32, and more.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/logo.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -58,6 +58,8 @@ section code{background:#1e293b;padding:2px 6px;border-radius:4px;font-size:.82r
 
 /* Board list */
 .board-list{display:grid;gap:12px;margin-bottom:16px}
+.board-group-header{font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-top:20px;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #1e293b}
+.board-group-header:first-child{margin-top:0}
 .board-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:16px;transition:border-color .2s}
 .board-card:hover{border-color:#07b6d3}
 .board-card h3{font-size:1rem;color:#e0e0e0;margin-bottom:4px}
@@ -129,6 +131,12 @@ A <strong>DX Cluster client</strong> for ESP32 boards with built-in screens.
 It connects to any DXSpider-compatible cluster server over Wi-Fi (telnet port
 7300), receives live DX spots, and displays them on the screen. You configure
 it via a web page on your phone — no computer needed after the initial flash.
+</p>
+<p>
+<strong>22 boards supported</strong> — LilyGO (T-Display-S3, T-Display, T-QT,
+T-HMI, T-Watch, T-Deck), M5Stack (Core, Core2, StickC Plus), Sunton CYD,
+Waveshare S3 Round, and <strong>9 Heltec boards</strong> (WiFi Kit 32,
+WiFi LoRa 32, Wireless Stick, Wireless Tracker). All with built-in displays.
 </p>
 <p>
 After flashing, the device becomes a standalone desk gadget (or wrist gadget
@@ -215,7 +223,7 @@ especially the ESP32-S3 BOOT button trick.
 </div>
 </div>
 
-<h3>Select your board:</h3>
+<h3>Select your board (22 supported):</h3>
 <div class="board-list" id="boards"></div>
 </section>
 
@@ -387,7 +395,7 @@ Setup mode also activates automatically if:
 <h3>USB hub</h3>
 <p>Plug directly into the computer, not through a hub. Some hubs block serial data.</p>
 <h3>ESP32-S3 boards: BOOT button trick</h3>
-<p>If you have an ESP32-S3 board (T-Display-S3, T-QT, T-HMI, T-Watch S3, Waveshare S3 Round) and the port doesn't appear:</p>
+<p>If you have an ESP32-S3 board (T-Display-S3, T-QT, T-HMI, T-Watch S3, Waveshare S3 Round, T-Deck, Heltec WiFi Kit 32 V3, WiFi LoRa 32 V3, Wireless Tracker) and the port doesn't appear:</p>
 <ol>
 <li>Unplug the board.</li>
 <li>Hold the <strong>BOOT</strong> button.</li>
@@ -419,8 +427,10 @@ Setup mode also activates automatically if:
 <div class="details-body">
 <ul>
 <li><strong>Wrong board selected?</strong> Make sure you selected the correct board for your hardware. Each board has a different display configuration. If you flashed the wrong firmware, re-flash with the correct board.</li>
+<li><strong>Heltec OLED boards:</strong> The WiFi Kit 32, WiFi LoRa 32, and Wireless Stick use SSD1306 OLED displays via I2C. If the screen is blank, double-check you selected the right Heltec variant — V1/V2 boards (ESP32) and V3 boards (ESP32-S3) use different I2C pins.</li>
+<li><strong>Heltec Wireless Tracker:</strong> Uses a TFT LCD (ST7735) via SPI, not OLED. Make sure you selected "Wireless Tracker" and not one of the OLED boards.</li>
 <li><strong>T-Watch 2020:</strong> The display is powered by the AXP202 PMU. The firmware initializes it automatically, but if the battery is completely dead, plug in USB power and wait 10 seconds.</li>
-<li><strong>Backlight too dim:</strong> The default brightness is 220/255. If your screen seems dark, try looking at it from different angles — some IPS panels look dark head-on.</li>
+<li><strong>Backlight too dim:</strong> The default brightness is 220/255. If your screen seems dark, try looking at it from different angles — some IPS panels look dark head-on. OLED boards (Heltec) don't have a backlight — they're always on at full brightness.</li>
 </ul>
 </div>
 </details>
@@ -621,32 +631,44 @@ device at any cluster server via the web admin UI.
 })();
 
 const boards = [
-  {id:"lilygo-tdisplay-s3",name:"LilyGO T-Display-S3",chip:"ESP32-S3",display:"1.9\" ST7789 320x170",manifest:"manifests/lilygo-tdisplay-s3.json"},
-  {id:"lilygo-tdisplay-s3-amoled",name:"LilyGO T-Display-S3 AMOLED",chip:"ESP32-S3",display:"1.91\" RM67162 536x240",manifest:"manifests/lilygo-tdisplay-s3-amoled.json"},
-  {id:"lilygo-tdisplay",name:"LilyGO T-Display",chip:"ESP32",display:"1.14\" ST7789 240x135",manifest:"manifests/lilygo-tdisplay.json"},
-  {id:"lilygo-t-qt",name:"LilyGO T-QT",chip:"ESP32-S3",display:"0.8\" GC9A01 128x128",manifest:"manifests/lilygo-t-qt.json"},
-  {id:"lilygo-t-hmi",name:"LilyGO T-HMI",chip:"ESP32-S3",display:"2.4\" ILI9341 320x240",manifest:"manifests/lilygo-t-hmi.json"},
-  {id:"m5stickc-plus",name:"M5Stack StickC Plus / Plus2",chip:"ESP32-PICO",display:"1.14\" ST7789 240x135",manifest:"manifests/m5stickc-plus.json"},
-  {id:"m5stack-core",name:"M5Stack Basic / Core / Fire",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core.json"},
-  {id:"m5stack-core2",name:"M5Stack Core2 / CoreS3",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core2.json"},
-  {id:"sunton-2432s028",name:"Sunton ESP32-2432S028R (CYD)",chip:"ESP32",display:"2.8\" ILI9341 320x240",manifest:"manifests/sunton-2432s028.json"},
-  {id:"waveshare-s3-round",name:"Waveshare S3 Round 1.28\"",chip:"ESP32-S3",display:"1.28\" GC9A01 240x240",manifest:"manifests/waveshare-s3-round.json"},
-  {id:"lilygo-t-watch-2020",name:"LilyGO T-Watch 2020",chip:"ESP32",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-2020.json"},
-  {id:"lilygo-t-watch-s3",name:"LilyGO T-Watch S3",chip:"ESP32-S3",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-s3.json"},
-  {id:"lilygo-tdeck",name:"LilyGO T-Deck",chip:"ESP32-S3",display:"2.8\" ST7789 320x240",manifest:"manifests/lilygo-tdeck.json"},
-  {id:"heltec-wifi-kit-32",name:"Heltec WiFi Kit 32",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32.json"},
-  {id:"heltec-wifi-kit-32-v2",name:"Heltec WiFi Kit 32 V2",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32-v2.json"},
-  {id:"heltec-wifi-kit-32-v3",name:"Heltec WiFi Kit 32 V3",chip:"ESP32-S3",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32-v3.json"},
-  {id:"heltec-wifi-lora-32",name:"Heltec WiFi LoRa 32",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32.json"},
-  {id:"heltec-wifi-lora-32-v2",name:"Heltec WiFi LoRa 32 V2",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32-v2.json"},
-  {id:"heltec-wifi-lora-32-v3",name:"Heltec WiFi LoRa 32 V3",chip:"ESP32-S3",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32-v3.json"},
-  {id:"heltec-wireless-stick",name:"Heltec Wireless Stick",chip:"ESP32",display:"0.49\" SSD1306 64x32",manifest:"manifests/heltec-wireless-stick.json"},
-  {id:"heltec-wireless-stick-lite",name:"Heltec Wireless Stick Lite",chip:"ESP32",display:"0.49\" SSD1306 64x32",manifest:"manifests/heltec-wireless-stick-lite.json"},
-  {id:"heltec-wireless-tracker",name:"Heltec Wireless Tracker",chip:"ESP32-S3",display:"0.96\" ST7735 160x80",manifest:"manifests/heltec-wireless-tracker.json"},
+  // LilyGO
+  {id:"lilygo-tdisplay-s3",name:"LilyGO T-Display-S3",chip:"ESP32-S3",display:"1.9\" ST7789 320x170",manifest:"manifests/lilygo-tdisplay-s3.json",group:"LilyGO"},
+  {id:"lilygo-tdisplay-s3-amoled",name:"LilyGO T-Display-S3 AMOLED",chip:"ESP32-S3",display:"1.91\" RM67162 536x240",manifest:"manifests/lilygo-tdisplay-s3-amoled.json",group:"LilyGO"},
+  {id:"lilygo-tdisplay",name:"LilyGO T-Display",chip:"ESP32",display:"1.14\" ST7789 240x135",manifest:"manifests/lilygo-tdisplay.json",group:"LilyGO"},
+  {id:"lilygo-t-qt",name:"LilyGO T-QT",chip:"ESP32-S3",display:"0.8\" GC9A01 128x128",manifest:"manifests/lilygo-t-qt.json",group:"LilyGO"},
+  {id:"lilygo-t-hmi",name:"LilyGO T-HMI",chip:"ESP32-S3",display:"2.4\" ILI9341 320x240",manifest:"manifests/lilygo-t-hmi.json",group:"LilyGO"},
+  {id:"lilygo-t-watch-2020",name:"LilyGO T-Watch 2020",chip:"ESP32",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-2020.json",group:"LilyGO"},
+  {id:"lilygo-t-watch-s3",name:"LilyGO T-Watch S3",chip:"ESP32-S3",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-s3.json",group:"LilyGO"},
+  {id:"lilygo-tdeck",name:"LilyGO T-Deck",chip:"ESP32-S3",display:"2.8\" ST7789 320x240",manifest:"manifests/lilygo-tdeck.json",group:"LilyGO"},
+  // M5Stack
+  {id:"m5stickc-plus",name:"M5Stack StickC Plus / Plus2",chip:"ESP32-PICO",display:"1.14\" ST7789 240x135",manifest:"manifests/m5stickc-plus.json",group:"M5Stack"},
+  {id:"m5stack-core",name:"M5Stack Basic / Core / Fire",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core.json",group:"M5Stack"},
+  {id:"m5stack-core2",name:"M5Stack Core2 / CoreS3",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core2.json",group:"M5Stack"},
+  // Sunton / Waveshare
+  {id:"sunton-2432s028",name:"Sunton ESP32-2432S028R (CYD)",chip:"ESP32",display:"2.8\" ILI9341 320x240",manifest:"manifests/sunton-2432s028.json",group:"Sunton / Waveshare"},
+  {id:"waveshare-s3-round",name:"Waveshare S3 Round 1.28\"",chip:"ESP32-S3",display:"1.28\" GC9A01 240x240",manifest:"manifests/waveshare-s3-round.json",group:"Sunton / Waveshare"},
+  // Heltec
+  {id:"heltec-wifi-kit-32",name:"Heltec WiFi Kit 32",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32.json",group:"Heltec"},
+  {id:"heltec-wifi-kit-32-v2",name:"Heltec WiFi Kit 32 V2",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32-v2.json",group:"Heltec"},
+  {id:"heltec-wifi-kit-32-v3",name:"Heltec WiFi Kit 32 V3",chip:"ESP32-S3",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-kit-32-v3.json",group:"Heltec"},
+  {id:"heltec-wifi-lora-32",name:"Heltec WiFi LoRa 32",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32.json",group:"Heltec"},
+  {id:"heltec-wifi-lora-32-v2",name:"Heltec WiFi LoRa 32 V2",chip:"ESP32",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32-v2.json",group:"Heltec"},
+  {id:"heltec-wifi-lora-32-v3",name:"Heltec WiFi LoRa 32 V3",chip:"ESP32-S3",display:"0.96\" SSD1306 128x64",manifest:"manifests/heltec-wifi-lora-32-v3.json",group:"Heltec"},
+  {id:"heltec-wireless-stick",name:"Heltec Wireless Stick",chip:"ESP32",display:"0.49\" SSD1306 64x32",manifest:"manifests/heltec-wireless-stick.json",group:"Heltec"},
+  {id:"heltec-wireless-stick-lite",name:"Heltec Wireless Stick Lite",chip:"ESP32",display:"0.49\" SSD1306 64x32",manifest:"manifests/heltec-wireless-stick-lite.json",group:"Heltec"},
+  {id:"heltec-wireless-tracker",name:"Heltec Wireless Tracker",chip:"ESP32-S3",display:"0.96\" ST7735 160x80",manifest:"manifests/heltec-wireless-tracker.json",group:"Heltec"},
 ];
 
 const container = document.getElementById("boards");
+let currentGroup = "";
 boards.forEach(b => {
+  if (b.group !== currentGroup) {
+    currentGroup = b.group;
+    const header = document.createElement("h4");
+    header.className = "board-group-header";
+    header.textContent = currentGroup;
+    container.appendChild(header);
+  }
   const div = document.createElement("div");
   div.className = "board-card";
   div.innerHTML = `
