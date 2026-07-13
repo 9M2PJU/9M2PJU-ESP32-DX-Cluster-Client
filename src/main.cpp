@@ -13,6 +13,7 @@
 #include "WebAdmin.h"
 #include "CommandMenu.h"
 #include "SettingsMenu.h"
+#include "Battery.h"
 
 #include <esp_sleep.h>
 
@@ -109,17 +110,31 @@ void setup() {
 
   // Initialise display
   display.begin();
+  // Initialise battery ADC
+  Battery::begin();
   // Apply saved backlight brightness
   settingsMenu.setBrightness(appConfig.backlightBrightness);
   display.setBrightness(settingsMenu.currentBrightness());
-  display.lcd().setTextSize(1);
-  display.lcd().setTextColor(0xFFFF);
-  display.lcd().setCursor(6, 6);
-  display.lcd().print("9M2PJU DX Cluster Client");
-  display.lcd().setCursor(6, 20);
-  display.lcd().print(BOARD_NAME);
-  display.lcd().setCursor(6, 34);
-  display.lcd().print("Booting...");
+
+  // Startup screen (LoRa_APRS_Tracker theme: navy blue header, yellow title,
+  // orange board name, cyan status)
+  auto &lcd = display.lcd();
+  lcd.fillScreen(0x0000);  // black
+  lcd.fillRect(0, 0, BOARD_DISPLAY_WIDTH, 19, 0x000F);  // navy blue header
+  lcd.setTextSize(1);
+  lcd.setTextColor(0xFFE0, 0x000F);  // yellow on navy
+  const char *title = "9M2PJU DX Cluster";
+  int tw = strlen(title) * 6;
+  lcd.setCursor((BOARD_DISPLAY_WIDTH - tw) / 2, 4);
+  lcd.print(title);
+
+  lcd.setTextColor(0xFD20);  // orange
+  lcd.setCursor(6, 24);
+  lcd.print(BOARD_NAME);
+
+  lcd.setTextColor(0x07FF);  // cyan
+  lcd.setCursor(6, 38);
+  lcd.print("Booting...");
 
   // Decide: config mode or normal mode?
   // 1. BOOT button held → config mode
@@ -160,6 +175,9 @@ void loop() {
 
   // ---- Normal mode ----
   cluster->loop();
+
+  // Update battery reading periodically (every 30s).
+  Battery::update();
 
   // Always run the settings menu button watcher.  When CLOSED, it
   // counts clicks for triple-click detection but does not consume

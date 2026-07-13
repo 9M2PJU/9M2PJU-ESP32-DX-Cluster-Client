@@ -48,6 +48,8 @@
 #define BOARD_DISPLAY_HEIGHT  170
 #define BOARD_DISPLAY_ROTATION 1
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 4
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_LILYGO_TDISPLAY_S3_AMOLED)
 #include "boards/lilygo_tdisplay_s3_amoled.h"
@@ -56,6 +58,8 @@
 #define BOARD_DISPLAY_HEIGHT  536
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_LILYGO_TDISPLAY)
 #include "boards/lilygo_tdisplay.h"
@@ -64,6 +68,8 @@
 #define BOARD_DISPLAY_HEIGHT  135
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 34
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_LILYGO_TQT)
 #include "boards/lilygo_tqt.h"
@@ -72,6 +78,8 @@
 #define BOARD_DISPLAY_HEIGHT  128
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 1
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_LILYGO_T_HMI)
 #include "boards/lilygo_t_hmi.h"
@@ -80,6 +88,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 4
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_M5STICKC_PLUS)
 #include "boards/m5stickc_plus.h"
@@ -88,6 +98,8 @@
 #define BOARD_DISPLAY_HEIGHT  135
 #define BOARD_DISPLAY_ROTATION 1
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_M5STACK_CORE)
 #include "boards/m5stack_core.h"
@@ -96,6 +108,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 1
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_M5STACK_CORE2)
 #include "boards/m5stack_core2.h"
@@ -104,6 +118,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 1
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_SUNTON_2432S028)
 #include "boards/sunton_2432s028.h"
@@ -112,6 +128,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 1
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 35
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_WAVESHARE_S3_ROUND)
 #include "boards/waveshare_s3_round.h"
@@ -120,6 +138,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_LILYGO_TWATCH_2020)
 #include "boards/lilygo_twatch_2020.h"
@@ -129,6 +149,8 @@
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
 #define BOARD_NEEDS_PMU_INIT  1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_LILYGO_TWATCH_S3)
 #include "boards/lilygo_twatch_s3.h"
@@ -137,6 +159,8 @@
 #define BOARD_DISPLAY_HEIGHT  240
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
+#define BOARD_BATTERY_ADC_PIN 255
+#define BOARD_BATTERY_DIVIDER 1.0f
 
 #elif defined(BOARD_LILYGO_TDECK)
 #include "boards/lilygo_tdeck.h"
@@ -146,6 +170,8 @@
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   1
 #define BOARD_NEEDS_POWER_INIT 1
+#define BOARD_BATTERY_ADC_PIN 4
+#define BOARD_BATTERY_DIVIDER 2.0f
 
 #elif defined(BOARD_HELTEC_WIFI_KIT_32) || defined(BOARD_HELTEC_WIFI_LORA_32)
 #include "boards/heltec_oled_128x64.h"
@@ -154,6 +180,8 @@
 #define BOARD_DISPLAY_HEIGHT  64
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 37
+#define BOARD_BATTERY_DIVIDER 3.2f
 
 #elif defined(BOARD_HELTEC_WIFI_KIT_32_V2) || defined(BOARD_HELTEC_WIFI_LORA_32_V2)
 #include "boards/heltec_oled_128x64.h"
@@ -162,6 +190,8 @@
 #define BOARD_DISPLAY_HEIGHT  64
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 37
+#define BOARD_BATTERY_DIVIDER 3.2f
 
 #elif defined(BOARD_HELTEC_WIFI_KIT_32_V3) || defined(BOARD_HELTEC_WIFI_LORA_32_V3)
 #include "boards/heltec_oled_128x64_v3.h"
@@ -170,6 +200,8 @@
 #define BOARD_DISPLAY_HEIGHT  64
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 1
+#define BOARD_BATTERY_DIVIDER 4.9f
 
 #elif defined(BOARD_HELTEC_WIRELESS_STICK) || defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
 #include "boards/heltec_oled_64x32.h"
@@ -178,6 +210,8 @@
 #define BOARD_DISPLAY_HEIGHT  32
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 37
+#define BOARD_BATTERY_DIVIDER 3.2f
 
 #elif defined(BOARD_HELTEC_WIRELESS_TRACKER)
 #include "boards/heltec_wireless_tracker.h"
@@ -186,6 +220,8 @@
 #define BOARD_DISPLAY_HEIGHT  80
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
+#define BOARD_BATTERY_ADC_PIN 1
+#define BOARD_BATTERY_DIVIDER 4.9f
 
 #else
 #error "No BOARD_* flag defined. Add one in platformio.ini."
