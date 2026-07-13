@@ -20,6 +20,7 @@
 
 class DxClusterClient;
 class CommandMenu;
+class SettingsMenu;
 
 class DxDisplay {
  public:
@@ -41,9 +42,18 @@ class DxDisplay {
   // the selected one). Call every frame while the menu is open.
   void renderMenu(const CommandMenu &menu);
 
+  // Render the settings menu overlay (WiFi AP, Sleep, Restart, Brightness).
+  void renderSettings(const SettingsMenu &menu);
+
+  // Render the confirm dialog for a settings action.
+  void renderSettingsConfirm(const SettingsMenu &menu);
+
   // Render the command response text (cluster output after a command).
   // Shows as many lines as fit on the display.
   void renderResponse(const DxClusterClient &client, const String &cmdTitle);
+
+  // Set backlight brightness (0-255).  No-op on boards without backlight.
+  void setBrightness(uint8_t level);
 
   // Access the underlying LovyanGFX instance (for splash screens etc.).
   BOARD_DISPLAY_CLASS &lcd();

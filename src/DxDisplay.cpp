@@ -1,6 +1,7 @@
 #include "DxDisplay.h"
 #include "DxClusterClient.h"
 #include "CommandMenu.h"
+#include "SettingsMenu.h"
 #include <time.h>
 
 // Theme colors (RGB565).
@@ -483,4 +484,147 @@ void DxDisplay::renderResponse(const DxClusterClient &client,
   int hw = strlen(hint) * 6;
   _lcd.setCursor((_width - hw) / 2, _height - 10);
   _lcd.print(hint);
+}
+
+// =============================================================================
+// Settings menu rendering
+// =============================================================================
+
+void DxDisplay::renderSettings(const SettingsMenu &menu) {
+  _lcd.fillScreen(COLOR_BG);
+
+  // Header
+  _lcd.setTextSize(1);
+  _lcd.setTextColor(COLOR_ACCENT);
+  const char *title = "SETTINGS";
+  int tw = strlen(title) * 6;
+  _lcd.setCursor((_width - tw) / 2, 4);
+  _lcd.print(title);
+  _lcd.drawFastHLine(0, 14, _width, COLOR_GRID);
+
+  // Menu items
+  size_t selected = menu.selectedIndex();
+  size_t count = SettingsMenu::ITEM_COUNT;
+
+  int itemHeight = 18;
+  int availableH = _height - 20;
+  int maxVisible = availableH / itemHeight;
+  if (maxVisible < 1) maxVisible = 1;
+
+  int y = 18;
+  size_t endIdx = (count < (size_t)maxVisible) ? count : (size_t)maxVisible;
+
+  for (size_t i = 0; i < endIdx; ++i) {
+    const SettingsMenu::Item &item = SettingsMenu::items()[i];
+    bool isSel = (i == selected);
+
+    if (isSel) {
+      _lcd.fillRect(0, y - 1, _width, itemHeight - 2, COLOR_PANEL);
+      _lcd.fillRect(0, y - 1, 3, itemHeight - 2, COLOR_ACCENT);
+    }
+
+    _lcd.setTextSize(1);
+    _lcd.setTextColor(isSel ? COLOR_ACCENT : COLOR_TEXT);
+    _lcd.setCursor(8, y);
+    int maxChars = (_width - 16) / 6;
+    String label = truncateForDisplay(String(item.label), maxChars);
+    _lcd.print(label);
+
+    // Description on wider displays
+    if (_width >= 160) {
+      int labelW = label.length() * 6;
+      int descX = 8 + labelW + 8;
+      int descMaxChars = (_width - descX - 4) / 6;
+      if (descMaxChars > 4) {
+        _lcd.setTextColor(isSel ? COLOR_TEXT_DIM : COLOR_GRID);
+        _lcd.setCursor(descX, y);
+        String desc = truncateForDisplay(String(item.desc), descMaxChars);
+        _lcd.print(desc);
+      }
+    }
+
+    y += itemHeight;
+  }
+
+  // Footer hint
+  _lcd.setTextColor(COLOR_TEXT_DIM);
+  _lcd.setTextSize(1);
+  const char *hint = "tap:next  hold:select";
+  int hw = strlen(hint) * 6;
+  if (hw <= _width) {
+    _lcd.setCursor((_width - hw) / 2, _height - 10);
+    _lcd.print(hint);
+  }
+}
+
+void DxDisplay::renderSettingsConfirm(const SettingsMenu &menu) {
+  _lcd.fillScreen(COLOR_BG);
+
+  // Header
+  _lcd.setTextSize(1);
+  _lcd.setTextColor(COLOR_ALERT);
+  const char *title = "CONFIRM";
+  int tw = strlen(title) * 6;
+  _lcd.setCursor((_width - tw) / 2, 4);
+  _lcd.print(title);
+  _lcd.drawFastHLine(0, 14, _width, COLOR_GRID);
+
+  // Action name
+  size_t idx = menu.selectedIndex();
+  const SettingsMenu::Item &item = SettingsMenu::items()[idx];
+
+  _lcd.setTextColor(COLOR_TEXT);
+  _lcd.setTextSize(1);
+  String label = truncateForDisplay(String(item.label), _width / 6 - 2);
+  int lw = label.length() * 6;
+  _lcd.setCursor((_width - lw) / 2, _height / 2 - 16);
+  _lcd.print(label);
+
+  // Yes / No choices
+  bool yes = menu.confirmYes();
+
+  int choiceY = _height / 2 + 4;
+  int halfW = _width / 2;
+
+  // No (left)
+  if (!yes) {
+    _lcd.fillRect(2, choiceY - 2, halfW - 4, 22, COLOR_PANEL);
+    _lcd.fillRect(2, choiceY - 2, 3, 22, COLOR_ACCENT);
+    _lcd.setTextColor(COLOR_ACCENT);
+  } else {
+    _lcd.setTextColor(COLOR_TEXT_DIM);
+  }
+  const char *noLabel = "No";
+  int noW = strlen(noLabel) * 6;
+  _lcd.setCursor((halfW - noW) / 2, choiceY + 2);
+  _lcd.print(noLabel);
+
+  // Yes (right)
+  if (yes) {
+    _lcd.fillRect(halfW + 2, choiceY - 2, halfW - 4, 22, COLOR_PANEL);
+    _lcd.fillRect(halfW + 2, choiceY - 2, 3, 22, COLOR_ALERT);
+    _lcd.setTextColor(COLOR_ALERT);
+  } else {
+    _lcd.setTextColor(COLOR_TEXT_DIM);
+  }
+  const char *yesLabel = "Yes";
+  int yesW = strlen(yesLabel) * 6;
+  _lcd.setCursor(halfW + (halfW - yesW) / 2, choiceY + 2);
+  _lcd.print(yesLabel);
+
+  // Footer hint
+  _lcd.setTextColor(COLOR_TEXT_DIM);
+  _lcd.setTextSize(1);
+  const char *hint = "tap:toggle  hold:ok";
+  int hw = strlen(hint) * 6;
+  if (hw <= _width) {
+    _lcd.setCursor((_width - hw) / 2, _height - 10);
+    _lcd.print(hint);
+  }
+}
+
+void DxDisplay::setBrightness(uint8_t level) {
+#if BOARD_HAS_BACKLIGHT
+  _lcd.setBrightness(level);
+#endif
 }

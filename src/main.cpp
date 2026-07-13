@@ -12,12 +12,16 @@
 #include "DxDisplay.h"
 #include "WebAdmin.h"
 #include "CommandMenu.h"
+#include "SettingsMenu.h"
+
+#include <esp_sleep.h>
 
 static AppConfig appConfig;
 static DxClusterClient *cluster = nullptr;
 static DxDisplay display;
 static WebAdmin webAdmin;
 static CommandMenu cmdMenu;
+static SettingsMenu settingsMenu;
 static bool configMode = false;
 static String lastSentCommand;  // Title for the response screen
 
@@ -26,6 +30,9 @@ static constexpr int BOOT_BUTTON_PIN = 0;
 
 // AP name prefix for config mode
 static constexpr const char *AP_PREFIX = "9M2PJU-DXCluster-";
+
+// Forward declarations
+void handleSettingsEvents(SettingsMenu::Event evt);
 
 String makeApName() {
   uint64_t mac = ESP.getEfuseMac();
@@ -102,6 +109,9 @@ void setup() {
 
   // Initialise display
   display.begin();
+  // Apply saved backlight brightness
+  settingsMenu.setBrightness(appConfig.backlightBrightness);
+  display.setBrightness(settingsMenu.currentBrightness());
   display.lcd().setTextSize(1);
   display.lcd().setTextColor(0xFFFF);
   display.lcd().setCursor(6, 6);
@@ -145,10 +155,41 @@ void loop() {
       ESP.restart();
     }
     delay(2);
-  } else {
-    cluster->loop();
+    return;
+  }
 
-    // Read the BOOT button and process menu events.
+  // ---- Normal mode ----
+  cluster->loop();
+
+  // Always run the settings menu button watcher.  When CLOSED, it
+  // counts clicks for triple-click detection but does not consume
+  // individual presses (CommandMenu still sees them).  When a
+  // triple-click is detected, it opens and takes over the button.
+  SettingsMenu::Event sEvt = settingsMenu.loop();
+
+  if (sEvt == SettingsMenu::Event::OPENED) {
+    // Triple-click detected — close command menu if it opened
+    // during the click sequence.
+    cmdMenu.close();
+  }
+
+  if (settingsMenu.isActive()) {
+    // ---- Settings menu is active ----
+    handleSettingsEvents(sEvt);
+
+    // Render settings UI
+    switch (settingsMenu.state()) {
+      case SettingsMenu::State::BROWSING:
+        display.renderSettings(settingsMenu);
+        break;
+      case SettingsMenu::State::CONFIRM:
+        display.renderSettingsConfirm(settingsMenu);
+        break;
+      default:
+        break;
+    }
+  } else {
+    // ---- Normal spot viewing / command menu ----
     CommandMenu::Event evt = cmdMenu.loop();
     switch (evt) {
       case CommandMenu::Event::SEND:
@@ -180,7 +221,84 @@ void loop() {
         display.renderResponse(*cluster, lastSentCommand);
         break;
     }
+  }
 
-    delay(2);
+  delay(2);
+}
+
+// Handle settings menu events (WiFi AP, Sleep, Restart, Brightness).
+void handleSettingsEvents(SettingsMenu::Event evt) {
+  switch (evt) {
+    case SettingsMenu::Event::OPENED:
+      Serial.println(F("Settings menu opened (triple-click)"));
+      break;
+
+    case SettingsMenu::Event::EXECUTE: {
+      SettingsMenu::Action action = settingsMenu.pendingAction();
+      switch (action) {
+        case SettingsMenu::Action::BRIGHTNESS: {
+          // Cycle to next brightness level
+          uint8_t level = settingsMenu.cycleBrightness();
+          display.setBrightness(level);
+          appConfig.backlightBrightness = level;
+          appConfig.save();
+          Serial.printf("Brightness set to %u\n", level);
+          break;
+        }
+        case SettingsMenu::Action::ENABLE_WIFI_AP:
+          if (settingsMenu.confirmYes()) {
+            Serial.println(F("Settings: rebooting into setup mode"));
+            display.lcd().fillScreen(0x0008);
+            display.lcd().setTextSize(1);
+            display.lcd().setTextColor(0x07FF);
+            display.lcd().setCursor(6, BOARD_DISPLAY_HEIGHT / 2 - 4);
+            display.lcd().print("Rebooting to setup...");
+            delay(800);
+            // Clear WiFi config so it boots into setup mode
+            appConfig.wifiSsid = "";
+            appConfig.save();
+            ESP.restart();
+          }
+          break;
+        case SettingsMenu::Action::SLEEP:
+          if (settingsMenu.confirmYes()) {
+            Serial.println(F("Settings: entering deep sleep"));
+            display.lcd().fillScreen(0x0008);
+            display.lcd().setTextSize(1);
+            display.lcd().setTextColor(0xBDF7);
+            display.lcd().setCursor(6, BOARD_DISPLAY_HEIGHT / 2 - 4);
+            display.lcd().print("Going to sleep...");
+            delay(800);
+            // Wake on BOOT button (GPIO 0, active low)
+            esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, 0);
+            esp_deep_sleep_start();
+          }
+          break;
+        case SettingsMenu::Action::RESTART:
+          if (settingsMenu.confirmYes()) {
+            Serial.println(F("Settings: restarting"));
+            display.lcd().fillScreen(0x0008);
+            display.lcd().setTextSize(1);
+            display.lcd().setTextColor(0x07FF);
+            display.lcd().setCursor(6, BOARD_DISPLAY_HEIGHT / 2 - 4);
+            display.lcd().print("Restarting...");
+            delay(800);
+            ESP.restart();
+          }
+          break;
+        default:
+          break;
+      }
+      // Return to browsing after execute (unless we rebooted/slept)
+      break;
+    }
+
+    case SettingsMenu::Event::CLOSED:
+      Serial.println(F("Settings menu closed"));
+      display.invalidate();  // Force full redraw of spot view
+      break;
+
+    default:
+      break;
   }
 }
