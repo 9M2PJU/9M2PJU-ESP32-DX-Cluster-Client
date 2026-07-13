@@ -199,8 +199,8 @@ void DxDisplay::drawSpot(const DxSpot &spot, int y, bool fresh,
 
   _lcd.setTextSize(1);
 
-  // Frequency (left, band-colored accent bar already drawn; text in cyan).
-  _lcd.setTextColor(COLOR_TEXT);
+  // Frequency (left, band-colored to match accent bar).
+  _lcd.setTextColor(accent);
   _lcd.setCursor(10, y + 3);
   _lcd.print(spot.frequency);
 
