@@ -40,6 +40,14 @@ jobs:
           - lilygo-t-watch-2020
           - lilygo-t-watch-s3
           - lilygo-tdeck
+          - heltec-wifi-kit-32
+          - heltec-wifi-kit-32-v2
+          - heltec-wifi-kit-32-v3
+          - heltec-wifi-lora-32
+          - heltec-wifi-lora-32-v2
+          - heltec-wifi-lora-32-v3
+          - heltec-wireless-stick
+          - heltec-wireless-stick-lite
 
     steps:
       - uses: actions/checkout@v4
@@ -113,6 +121,14 @@ jobs:
           echo "| lilygo-t-watch-2020 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| lilygo-t-watch-s3 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| lilygo-tdeck | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-kit-32 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-kit-32-v2 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-kit-32-v3 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-lora-32 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-lora-32-v2 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wifi-lora-32-v3 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wireless-stick | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wireless-stick-lite | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Firmware binaries are available as artifacts on the Actions run page." >> $GITHUB_STEP_SUMMARY
           echo "Click the green checkmark above, then scroll down to Artifacts." >> $GITHUB_STEP_SUMMARY

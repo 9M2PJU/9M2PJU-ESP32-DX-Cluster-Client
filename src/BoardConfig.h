@@ -29,7 +29,11 @@
     !defined(BOARD_SUNTON_2432S028) && !defined(BOARD_WAVESHARE_S3_ROUND) && \
     !defined(BOARD_LILYGO_T_HMI) && !defined(BOARD_LILYGO_TDISPLAY_S3_AMOLED) && \
     !defined(BOARD_LILYGO_TWATCH_2020) && !defined(BOARD_LILYGO_TWATCH_S3) && \
-    !defined(BOARD_LILYGO_TDECK)
+    !defined(BOARD_LILYGO_TDECK) && !defined(BOARD_HELTEC_WIFI_KIT_32) && \
+    !defined(BOARD_HELTEC_WIFI_KIT_32_V2) && !defined(BOARD_HELTEC_WIFI_KIT_32_V3) && \
+    !defined(BOARD_HELTEC_WIFI_LORA_32) && !defined(BOARD_HELTEC_WIFI_LORA_32_V2) && \
+    !defined(BOARD_HELTEC_WIFI_LORA_32_V3) && !defined(BOARD_HELTEC_WIRELESS_STICK) && \
+    !defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
 #define BOARD_LILYGO_TDISPLAY_S3 1
 #endif
 
@@ -143,6 +147,38 @@
 #define BOARD_HAS_BACKLIGHT   1
 #define BOARD_NEEDS_POWER_INIT 1
 
+#elif defined(BOARD_HELTEC_WIFI_KIT_32) || defined(BOARD_HELTEC_WIFI_LORA_32)
+#include "boards/heltec_oled_128x64.h"
+#define BOARD_DISPLAY_CLASS   LGFX_HELTEC_OLED_128x64
+#define BOARD_DISPLAY_WIDTH   128
+#define BOARD_DISPLAY_HEIGHT  64
+#define BOARD_DISPLAY_ROTATION 0
+#define BOARD_HAS_BACKLIGHT   0
+
+#elif defined(BOARD_HELTEC_WIFI_KIT_32_V2) || defined(BOARD_HELTEC_WIFI_LORA_32_V2)
+#include "boards/heltec_oled_128x64.h"
+#define BOARD_DISPLAY_CLASS   LGFX_HELTEC_OLED_128x64
+#define BOARD_DISPLAY_WIDTH   128
+#define BOARD_DISPLAY_HEIGHT  64
+#define BOARD_DISPLAY_ROTATION 0
+#define BOARD_HAS_BACKLIGHT   0
+
+#elif defined(BOARD_HELTEC_WIFI_KIT_32_V3) || defined(BOARD_HELTEC_WIFI_LORA_32_V3)
+#include "boards/heltec_oled_128x64_v3.h"
+#define BOARD_DISPLAY_CLASS   LGFX_HELTEC_OLED_128x64_V3
+#define BOARD_DISPLAY_WIDTH   128
+#define BOARD_DISPLAY_HEIGHT  64
+#define BOARD_DISPLAY_ROTATION 0
+#define BOARD_HAS_BACKLIGHT   0
+
+#elif defined(BOARD_HELTEC_WIRELESS_STICK) || defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
+#include "boards/heltec_oled_64x32.h"
+#define BOARD_DISPLAY_CLASS   LGFX_HELTEC_OLED_64x32
+#define BOARD_DISPLAY_WIDTH   64
+#define BOARD_DISPLAY_HEIGHT  32
+#define BOARD_DISPLAY_ROTATION 0
+#define BOARD_HAS_BACKLIGHT   0
+
 #else
 #error "No BOARD_* flag defined. Add one in platformio.ini."
 #endif
@@ -174,4 +210,20 @@
 #define BOARD_NAME "LilyGO T-Watch S3"
 #elif defined(BOARD_LILYGO_TDECK)
 #define BOARD_NAME "LilyGO T-Deck"
+#elif defined(BOARD_HELTEC_WIFI_KIT_32)
+#define BOARD_NAME "Heltec WiFi Kit 32"
+#elif defined(BOARD_HELTEC_WIFI_KIT_32_V2)
+#define BOARD_NAME "Heltec WiFi Kit 32 V2"
+#elif defined(BOARD_HELTEC_WIFI_KIT_32_V3)
+#define BOARD_NAME "Heltec WiFi Kit 32 V3"
+#elif defined(BOARD_HELTEC_WIFI_LORA_32)
+#define BOARD_NAME "Heltec WiFi LoRa 32"
+#elif defined(BOARD_HELTEC_WIFI_LORA_32_V2)
+#define BOARD_NAME "Heltec WiFi LoRa 32 V2"
+#elif defined(BOARD_HELTEC_WIFI_LORA_32_V3)
+#define BOARD_NAME "Heltec WiFi LoRa 32 V3"
+#elif defined(BOARD_HELTEC_WIRELESS_STICK)
+#define BOARD_NAME "Heltec Wireless Stick"
+#elif defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
+#define BOARD_NAME "Heltec Wireless Stick Lite"
 #endif

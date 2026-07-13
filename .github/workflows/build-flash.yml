@@ -41,6 +41,14 @@ jobs:
           - lilygo-t-watch-2020
           - lilygo-t-watch-s3
           - lilygo-tdeck
+          - heltec-wifi-kit-32
+          - heltec-wifi-kit-32-v2
+          - heltec-wifi-kit-32-v3
+          - heltec-wifi-lora-32
+          - heltec-wifi-lora-32-v2
+          - heltec-wifi-lora-32-v3
+          - heltec-wireless-stick
+          - heltec-wireless-stick-lite
 
     steps:
       - uses: actions/checkout@v4
@@ -116,6 +124,9 @@ jobs:
               "m5stickc-plus", "m5stack-core", "m5stack-core2",
               "sunton-2432s028", "waveshare-s3-round",
               "lilygo-t-watch-2020", "lilygo-t-watch-s3", "lilygo-tdeck",
+              "heltec-wifi-kit-32", "heltec-wifi-kit-32-v2", "heltec-wifi-kit-32-v3",
+              "heltec-wifi-lora-32", "heltec-wifi-lora-32-v2", "heltec-wifi-lora-32-v3",
+              "heltec-wireless-stick", "heltec-wireless-stick-lite",
           ]
 
           # Artifacts are downloaded as artifacts/firmware-<env>/{firmware,bootloader,partitions,boot_app0}.bin
@@ -160,6 +171,14 @@ jobs:
               "lilygo-t-watch-2020":        {"chip": "ESP32",     "bl_offset": 0x1000},
               "lilygo-t-watch-s3":          {"chip": "ESP32-S3",  "bl_offset": 0x0},
               "lilygo-tdeck":               {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "heltec-wifi-kit-32":         {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wifi-kit-32-v2":      {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wifi-kit-32-v3":      {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "heltec-wifi-lora-32":        {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wifi-lora-32-v2":     {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wifi-lora-32-v3":     {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "heltec-wireless-stick":      {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wireless-stick-lite": {"chip": "ESP32",     "bl_offset": 0x1000},
           }
 
           # boot_app0.bin is the same for all boards — find it from any env
@@ -241,6 +260,9 @@ jobs:
               'm5stickc-plus', 'm5stack-core', 'm5stack-core2',
               'sunton-2432s028', 'waveshare-s3-round',
               'lilygo-t-watch-2020', 'lilygo-t-watch-s3', 'lilygo-tdeck',
+              'heltec-wifi-kit-32', 'heltec-wifi-kit-32-v2', 'heltec-wifi-kit-32-v3',
+              'heltec-wifi-lora-32', 'heltec-wifi-lora-32-v2', 'heltec-wifi-lora-32-v3',
+              'heltec-wireless-stick', 'heltec-wireless-stick-lite',
           ]
           for env in envs:
               fw = f'site/firmware/{env}/firmware.bin'
