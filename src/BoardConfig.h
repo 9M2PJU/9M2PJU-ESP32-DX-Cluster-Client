@@ -33,7 +33,7 @@
     !defined(BOARD_HELTEC_WIFI_KIT_32_V2) && !defined(BOARD_HELTEC_WIFI_KIT_32_V3) && \
     !defined(BOARD_HELTEC_WIFI_LORA_32) && !defined(BOARD_HELTEC_WIFI_LORA_32_V2) && \
     !defined(BOARD_HELTEC_WIFI_LORA_32_V3) && !defined(BOARD_HELTEC_WIRELESS_STICK) && \
-    !defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
+    !defined(BOARD_HELTEC_WIRELESS_STICK_LITE) && !defined(BOARD_HELTEC_WIRELESS_TRACKER)
 #define BOARD_LILYGO_TDISPLAY_S3 1
 #endif
 
@@ -179,6 +179,14 @@
 #define BOARD_DISPLAY_ROTATION 0
 #define BOARD_HAS_BACKLIGHT   0
 
+#elif defined(BOARD_HELTEC_WIRELESS_TRACKER)
+#include "boards/heltec_wireless_tracker.h"
+#define BOARD_DISPLAY_CLASS   LGFX_HELTEC_WIRELESS_TRACKER
+#define BOARD_DISPLAY_WIDTH   160
+#define BOARD_DISPLAY_HEIGHT  80
+#define BOARD_DISPLAY_ROTATION 0
+#define BOARD_HAS_BACKLIGHT   0
+
 #else
 #error "No BOARD_* flag defined. Add one in platformio.ini."
 #endif
@@ -226,4 +234,6 @@
 #define BOARD_NAME "Heltec Wireless Stick"
 #elif defined(BOARD_HELTEC_WIRELESS_STICK_LITE)
 #define BOARD_NAME "Heltec Wireless Stick Lite"
+#elif defined(BOARD_HELTEC_WIRELESS_TRACKER)
+#define BOARD_NAME "Heltec Wireless Tracker"
 #endif

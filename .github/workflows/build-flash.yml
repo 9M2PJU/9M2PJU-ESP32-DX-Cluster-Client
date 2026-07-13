@@ -49,6 +49,7 @@ jobs:
           - heltec-wifi-lora-32-v3
           - heltec-wireless-stick
           - heltec-wireless-stick-lite
+          - heltec-wireless-tracker
 
     steps:
       - uses: actions/checkout@v4
@@ -127,6 +128,7 @@ jobs:
               "heltec-wifi-kit-32", "heltec-wifi-kit-32-v2", "heltec-wifi-kit-32-v3",
               "heltec-wifi-lora-32", "heltec-wifi-lora-32-v2", "heltec-wifi-lora-32-v3",
               "heltec-wireless-stick", "heltec-wireless-stick-lite",
+              "heltec-wireless-tracker",
           ]
 
           # Artifacts are downloaded as artifacts/firmware-<env>/{firmware,bootloader,partitions,boot_app0}.bin
@@ -179,6 +181,7 @@ jobs:
               "heltec-wifi-lora-32-v3":     {"chip": "ESP32-S3",  "bl_offset": 0x0},
               "heltec-wireless-stick":      {"chip": "ESP32",     "bl_offset": 0x1000},
               "heltec-wireless-stick-lite": {"chip": "ESP32",     "bl_offset": 0x1000},
+              "heltec-wireless-tracker":   {"chip": "ESP32-S3",  "bl_offset": 0x0},
           }
 
           # boot_app0.bin is the same for all boards — find it from any env

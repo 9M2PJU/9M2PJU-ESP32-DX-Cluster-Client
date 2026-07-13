@@ -48,6 +48,7 @@ jobs:
           - heltec-wifi-lora-32-v3
           - heltec-wireless-stick
           - heltec-wireless-stick-lite
+          - heltec-wireless-tracker
 
     steps:
       - uses: actions/checkout@v4
@@ -129,6 +130,7 @@ jobs:
           echo "| heltec-wifi-lora-32-v3 | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| heltec-wireless-stick | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| heltec-wireless-stick-lite | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| heltec-wireless-tracker | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Firmware binaries are available as artifacts on the Actions run page." >> $GITHUB_STEP_SUMMARY
           echo "Click the green checkmark above, then scroll down to Artifacts." >> $GITHUB_STEP_SUMMARY

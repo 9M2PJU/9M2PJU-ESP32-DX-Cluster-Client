@@ -48,8 +48,9 @@ protocol on port 7300 (DXSpider, CC Cluster, AR-Cluster, etc.).
 - **13 boards supported** out of the box — LilyGO T-Display-S3, T-Display,
   T-QT, T-HMI, T-Watch 2020, T-Watch S3, T-Deck, M5Stack Core/Core2,
   M5StickC Plus, Sunton CYD, Waveshare S3 Round, and the T-Display-S3 AMOLED.
-  Plus **8 Heltec boards** with OLED displays: WiFi Kit 32 (V1/V2/V3),
-  WiFi LoRa 32 (V1/V2/V3), Wireless Stick, and Wireless Stick Lite.
+  Plus **9 Heltec boards** with OLED/TFT displays: WiFi Kit 32 (V1/V2/V3),
+  WiFi LoRa 32 (V1/V2/V3), Wireless Stick, Wireless Stick Lite, and
+  Wireless Tracker.
   See the [supported boards table](#supported-boards).
 
 - **Adaptive UI** — large panels (320px+) show a scrolling spot list with
@@ -102,6 +103,7 @@ One PlatformIO environment per board. Pick the one that matches your hardware.
 | `heltec-wifi-lora-32-v3` | Heltec WiFi LoRa 32 V3 | 0.96" SSD1306 (I2C) | ESP32-S3 | 128x64 |
 | `heltec-wireless-stick` | Heltec Wireless Stick | 0.49" SSD1306 (I2C) | ESP32 | 64x32 |
 | `heltec-wireless-stick-lite` | Heltec Wireless Stick Lite | 0.49" SSD1306 (I2C) | ESP32 | 64x32 |
+| `heltec-wireless-tracker` | Heltec Wireless Tracker | 0.96" ST7735 (SPI) | ESP32-S3 | 160x80 |
 
 > **Don't see your board?** See [Adding a New Board](docs/08-adding-new-board.md)
 > — it takes about 30 lines of code.
@@ -402,6 +404,7 @@ src/
     heltec_oled_128x64.h
     heltec_oled_128x64_v3.h
     heltec_oled_64x32.h
+    heltec_wireless_tracker.h
 docs/
   index.html                Web flasher page (ESP Web Tools)
   01-getting-started.md     Installation & first boot
