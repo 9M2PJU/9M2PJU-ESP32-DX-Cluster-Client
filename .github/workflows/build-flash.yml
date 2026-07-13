@@ -153,6 +153,7 @@ jobs:
         run: |
           cp docs/index.html site/index.html
           cp -r docs/assets/* site/assets/
+          cp docs/CNAME site/CNAME
 
       - name: Package firmware + create manifests
         run: |

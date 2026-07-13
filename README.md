@@ -9,7 +9,7 @@
 > telnet, and shows live DX spots on the display — no computer required.
 
 [![Build and Publish](https://github.com/9M2PJU/9M2PJU-ESP32-DX-Cluster-Client/actions/workflows/build-flash.yml/badge.svg)](https://github.com/9M2PJU/9M2PJU-ESP32-DX-Cluster-Client/actions/workflows/build-flash.yml)
-[![GitHub Pages](https://img.shields.io/badge/Web%20Flasher-Live-brightgreen)](https://9m2pju.github.io/9M2PJU-ESP32-DX-Cluster-Client/)
+[![GitHub Pages](https://img.shields.io/badge/Web%20Flasher-Live-brightgreen)](https://esp32dxcluster.hamradio.my/)
 
 ---
 
@@ -114,7 +114,7 @@ One PlatformIO environment per board. Pick the one that matches your hardware.
 
 ### Step 1: Flash the firmware
 
-1. Open the **[Web Flasher](https://9m2pju.github.io/9M2PJU-ESP32-DX-Cluster-Client/)**
+1. Open the **[Web Flasher](https://esp32dxcluster.hamradio.my/)**
    in Chrome or Edge.
 2. Connect your ESP32 board via USB.
 3. Select your board from the list.
@@ -450,7 +450,7 @@ The `.github/workflows/build-flash.yml` workflow:
 2. Packages the firmware binaries (bootloader, partitions, boot_app0, firmware).
 3. Creates ESP Web Tools manifest JSON files for each board.
 4. Publishes everything to GitHub Pages at
-   `https://9m2pju.github.io/9M2PJU-ESP32-DX-Cluster-Client/`.
+   `https://esp32dxcluster.hamradio.my/`.
 
 The web flasher page uses [ESP Web Tools](https://esphome.github.io/esp-web-tools/)
 which handles Web Serial connection, flashing, and verification — all in the
