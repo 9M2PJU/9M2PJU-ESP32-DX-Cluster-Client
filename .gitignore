@@ -1,0 +1,15 @@
+.pio/
+.pioenvs/
+.piolibdeps/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+include/config.h
+*.log
+*.bin
+*.elf
+*.map
+.DS_Store
+Thumbs.db
+AGENTS.md

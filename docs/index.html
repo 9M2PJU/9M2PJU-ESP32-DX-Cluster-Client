@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>9M2PJU ESP32 DX Cluster Client — Web Flasher</title>
+<meta name="description" content="Flash the 9M2PJU ESP32 DX Cluster Client firmware to your ESP32 board directly from your browser. No software install needed.">
+<meta property="og:title" content="9M2PJU ESP32 DX Cluster Client — Web Flasher">
+<meta property="og:description" content="Flash firmware to your ESP32 board directly from your browser. Supports 13 boards including LilyGO T-Display-S3, M5Stack, T-Watch, and more.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="9M2PJU ESP32 DX Cluster Client — Web Flasher">
+<meta name="twitter:description" content="Flash firmware to your ESP32 board directly from your browser.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0a0e1a;color:#e0e0e0;min-height:100vh;padding:20px;line-height:1.5}
+.container{max-width:760px;margin:0 auto}
+
+/* Header */
+header{text-align:center;margin-bottom:28px}
+header h1{font-size:1.7rem;color:#07b6d3;margin-bottom:6px}
+header p{color:#64748b;font-size:.9rem}
+.badges{margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.badges img{height:20px}
+
+/* Sections */
+section{margin-bottom:32px}
+section h2{font-size:1.15rem;color:#07b6d3;margin-bottom:12px;border-bottom:1px solid #1e293b;padding-bottom:6px}
+section h3{font-size:.95rem;color:#94a3b8;margin-bottom:8px;margin-top:16px}
+section p{font-size:.88rem;color:#cbd5e1;margin-bottom:10px}
+section ul,section ol{font-size:.88rem;color:#cbd5e1;padding-left:22px;margin-bottom:10px}
+section li{margin-bottom:5px}
+section code{background:#1e293b;padding:2px 6px;border-radius:4px;font-size:.82rem;color:#07b6d3}
+
+/* Notice box */
+.notice{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:20px;font-size:.85rem;color:#94a3b8}
+.notice strong{color:#07b6d3}
+.notice ul{margin-top:8px;padding-left:20px}
+.notice li{margin-top:4px}
+
+/* Info box */
+.info-box{background:#0f2937;border:1px solid #07b6d3;border-radius:8px;padding:14px;margin-bottom:16px;font-size:.85rem;color:#cbd5e1}
+.info-box strong{color:#07b6d3}
+
+/* Warning box */
+.warn-box{background:#1c1408;border:1px solid #f59e0b;border-radius:8px;padding:14px;margin-bottom:16px;font-size:.85rem;color:#fbbf24}
+.warn-box strong{color:#f59e0b}
+
+/* Step cards */
+.steps{display:grid;gap:10px;margin-bottom:16px}
+.step{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:14px;display:flex;gap:12px}
+.step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#07b6d3;color:#000;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+.step-body{flex:1}
+.step-body h4{font-size:.9rem;color:#e0e0e0;margin-bottom:4px}
+.step-body p{font-size:.82rem;color:#94a3b8;margin:0}
+
+/* Board list */
+.board-list{display:grid;gap:12px;margin-bottom:16px}
+.board-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:16px;transition:border-color .2s}
+.board-card:hover{border-color:#07b6d3}
+.board-card h3{font-size:1rem;color:#e0e0e0;margin-bottom:4px}
+.board-card .info{font-size:.8rem;color:#64748b;margin-bottom:12px}
+.board-card .chip{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:4px;background:#1e293b;color:#94a3b8;margin-right:4px}
+esp-web-install-button{display:block;margin-top:10px}
+esp-web-install-button::part(button){
+  background:#07b6d3;color:#000;border:none;border-radius:6px;
+  padding:10px 24px;font-size:.9rem;font-weight:600;cursor:pointer;
+  transition:background .2s
+}
+esp-web-install-button::part(button):hover{background:#0699b3}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:14px}
+th,td{border:1px solid #1e293b;padding:8px 10px;text-align:left}
+th{background:#111827;color:#07b6d3;font-weight:600}
+td{color:#cbd5e1}
+tr:nth-child(even){background:#0d1526}
+
+/* Collapsible */
+details{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:0;margin-bottom:10px;overflow:hidden}
+details summary{padding:12px 14px;cursor:pointer;font-size:.88rem;color:#07b6d3;font-weight:600;user-select:none}
+details summary:hover{background:#1e293b}
+details[open] summary{border-bottom:1px solid #1e293b}
+details .details-body{padding:14px}
+
+/* ASCII art */
+.ascii{background:#0d1526;border:1px solid #1e293b;border-radius:6px;padding:12px;font-family:monospace;font-size:.72rem;color:#94a3b8;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.3}
+
+/* Footer */
+footer{text-align:center;color:#334155;font-size:.78rem;margin-top:32px;padding-top:20px;border-top:1px solid #1e293b}
+footer a{color:#07b6d3;text-decoration:none}
+footer a:hover{text-decoration:underline}
+footer .support{margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+footer .support a{display:inline-block;padding:6px 16px;border-radius:6px;font-size:.8rem;font-weight:600;text-decoration:none}
+footer .support .bmc{background:#ffdd00;color:#000}
+footer .support .pp{background:#00457c;color:#fff}
+
+/* Misc */
+a{color:#07b6d3;text-decoration:none}
+a:hover{text-decoration:underline}
+.hint{font-size:.78rem;color:#64748b;margin-top:4px}
+.kbd{display:inline-block;padding:1px 6px;border:1px solid #334155;border-radius:3px;background:#1e293b;font-size:.78rem;color:#cbd5e1;font-family:monospace}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- =========================================================================
+     HEADER
+     ========================================================================= -->
+<header>
+<img src="assets/logo.png" alt="9M2PJU ESP32 DX Cluster Client" style="max-width:420px;width:100%;height:auto;margin-bottom:14px;border-radius:12px">
+<h1>9M2PJU ESP32 DX Cluster Client</h1>
+<p>Flash firmware to your ESP32 board directly from your browser — no software install needed.</p>
+<div class="badges">
+<img src="https://github.com/9M2PJU/9M2PJU-ESP32-DX-Cluster-Client/actions/workflows/build-flash.yml/badge.svg" alt="Build Status">
+</div>
+</header>
+
+<!-- =========================================================================
+     WHAT IS THIS
+     ========================================================================= -->
+<section>
+<h2>What is this?</h2>
+<p>
+A <strong>DX Cluster client</strong> for ESP32 boards with built-in screens.
+It connects to any DXSpider-compatible cluster server over Wi-Fi (telnet port
+7300), receives live DX spots, and displays them on the screen. You configure
+it via a web page on your phone — no computer needed after the initial flash.
+</p>
+<p>
+After flashing, the device becomes a standalone desk gadget (or wrist gadget
+if you have a T-Watch) that shows real-time amateur radio DX spots as they
+come in from around the world.
+</p>
+</section>
+
+<!-- =========================================================================
+     BEFORE YOU START
+     ========================================================================= -->
+<section>
+<h2>Before you start</h2>
+<div class="warn-box">
+<strong>Browser requirement:</strong> You need a <strong>Chromium-based browser</strong>
+with Web Serial support. This page will not work in Firefox or Safari.
+</div>
+<table>
+<tr><th>Browser</th><th>Supported</th><th>Notes</th></tr>
+<tr><td>Google Chrome</td><td>Yes</td><td>Desktop &amp; Android. Recommended.</td></tr>
+<tr><td>Microsoft Edge</td><td>Yes</td><td>Desktop. Recommended.</td></tr>
+<tr><td>Opera</td><td>Yes</td><td>Desktop.</td></tr>
+<tr><td>Brave</td><td>Yes</td><td>Desktop. May need to enable Web Serial flag.</td></tr>
+<tr><td>Mozilla Firefox</td><td>No</td><td>No Web Serial API support.</td></tr>
+<tr><td>Apple Safari</td><td>No</td><td>No Web Serial API support.</td></tr>
+<tr><td>iPhone/iPad (any browser)</td><td>No</td><td>iOS does not expose Web Serial.</td></tr>
+</table>
+<h3>You will need:</h3>
+<ul>
+<li>Your ESP32 board with a screen (see the board list below).</li>
+<li>A <strong>USB data cable</strong> (not a charge-only cable — many cheap cables only carry power).</li>
+<li>A Wi-Fi network (2.4 GHz — ESP32 does not support 5 GHz).</li>
+<li>Your amateur radio callsign.</li>
+<li>A DX cluster server address and port (default: <code>9m2pju.hamradio.my:7300</code>).</li>
+</ul>
+</section>
+
+<!-- =========================================================================
+     STEP 1: FLASH
+     ========================================================================= -->
+<section>
+<h2>Step 1 — Flash the firmware</h2>
+<div class="info-box">
+<strong>Tip:</strong> If the serial port doesn't appear when you click Connect,
+see the <a href="#troubleshooting">troubleshooting section</a> below —
+especially the ESP32-S3 BOOT button trick.
+</div>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h4>Connect your board via USB</h4>
+<p>Plug your ESP32 board into your computer. Use a direct USB port if possible (avoid hubs).</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h4>Select your board below</h4>
+<p>Find your board in the list and click the <strong>Connect</strong> button on its card.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h4>Choose the serial port</h4>
+<p>Your browser will show a list of serial ports. Select the one for your board:
+<br>Windows: <code>COM3</code> (or similar), Mac: <code>/dev/cu.usbserial-*</code>, Linux: <code>/dev/ttyUSB0</code></p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<h4>Click Install</h4>
+<p>Click <strong>Install</strong> and wait. Flashing takes about 30–60 seconds. Do not unplug during flashing.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">5</div>
+<div class="step-body">
+<h4>Wait for reboot</h4>
+<p>After flashing, the board reboots automatically. The screen will show "9M2PJU DX Cluster Client" and then "SETUP MODE".</p>
+</div>
+</div>
+</div>
+
+<h3>Select your board:</h3>
+<div class="board-list" id="boards"></div>
+</section>
+
+<!-- =========================================================================
+     STEP 2: CONFIGURE
+     ========================================================================= -->
+<section>
+<h2>Step 2 — Configure via the web admin UI</h2>
+<p>
+After flashing, the device boots into <strong>setup mode</strong> (because no
+Wi-Fi is configured yet). It creates a Wi-Fi hotspot that you connect to with
+your phone to enter your settings.
+</p>
+
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h4>Find the setup Wi-Fi network</h4>
+<p>The screen shows a Wi-Fi name like <code>9M2PJU-DXCluster-A1B2</code>. On your phone, open Wi-Fi settings and connect to that network.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h4>Open the configuration page</h4>
+<p>A captive portal page should pop up automatically. If it doesn't, open any browser and go to <code>http://192.168.4.1/</code></p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h4>Fill in the form</h4>
+<p>Enter your Wi-Fi network (tap "Scan for networks" to see what's nearby), Wi-Fi password, your callsign, and the DX cluster server address.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<h4>Tap "Save &amp; Reboot"</h4>
+<p>The device saves your settings, reboots, connects to your Wi-Fi, and starts showing DX spots.</p>
+</div>
+</div>
+</div>
+
+<h3>Configuration form fields</h3>
+<table>
+<tr><th>Field</th><th>What to enter</th><th>Example</th></tr>
+<tr><td><strong>Wi-Fi SSID</strong></td><td>Your Wi-Fi network name (tap "Scan" to list nearby networks)</td><td><code>MyHomeWiFi</code></td></tr>
+<tr><td><strong>Wi-Fi Password</strong></td><td>Your Wi-Fi password</td><td><code>supersecret</code></td></tr>
+<tr><td><strong>Callsign</strong></td><td>Your amateur radio callsign</td><td><code>9M2PJU</code></td></tr>
+<tr><td><strong>Callsign Password</strong></td><td>Only if the cluster requires one. Leave blank if unsure.</td><td><code>(leave blank)</code></td></tr>
+<tr><td><strong>DX Cluster Host</strong></td><td>The cluster server hostname or IP</td><td><code>9m2pju.hamradio.my</code></td></tr>
+<tr><td><strong>DX Cluster Port</strong></td><td>The cluster telnet port</td><td><code>7300</code></td></tr>
+<tr><td><strong>Post-login command</strong></td><td>Optional. A command sent after login (advanced).</td><td><code>set/dx</code></td></tr>
+</table>
+
+<div class="info-box">
+<strong>Settings are saved permanently.</strong> Configuration is stored in the
+ESP32's NVS (non-volatile storage). It survives power cycles and firmware
+updates. You only need to configure once.
+</div>
+</section>
+
+<!-- =========================================================================
+     STEP 3: USE IT
+     ========================================================================= -->
+<section>
+<h2>Step 3 — Using the device</h2>
+
+<h3>The spot display</h3>
+<p>
+After configuration, the device connects to your Wi-Fi and the DX cluster.
+The display shows:
+</p>
+<ul>
+<li><strong>Header bar</strong> — "9M2PJU DX Cluster Client" (or a truncated version on small screens), a connection status dot (cyan = connected, orange = connecting), and the UTC clock.</li>
+<li><strong>Spot list</strong> — scrolling list of recent DX spots, newest first. Each spot shows the frequency (colour-coded by band), DX callsign, spotter callsign, and comment.</li>
+</ul>
+
+<h3>Wide displays (T-Display-S3, M5Stack Core, Sunton CYD, T-HMI)</h3>
+<div class="ascii">+------------------------------+
+| 9M2PJU DX Cluster  o  12:34Z |
++------------------------------+
+| |14.074  JA1ABC               |
+|  de 9M2XYZ  FT8, strong in EU |
+| |21.300  VK2DEF               |
+|  de 9M2ABC  big signal        |
+| | 7.025  DL1AAA               |
+|  de N0CALL  Europe opening    |
++------------------------------+</div>
+
+<h3>Small / round displays (T-QT, Waveshare round, T-Watch)</h3>
+<div class="ascii">      9M2PJU DX Cluster
+         12:34Z
+      (   o   )
+       14.074
+       JA1ABC
+       de 9M2XYZ</div>
+
+<h3>The button command menu</h3>
+<p>
+The <strong>BOOT button</strong> (GPIO 0, the same button used for flashing)
+opens a command menu in normal mode. You can send DX cluster commands without
+a computer or telnet client.
+</p>
+<table>
+<tr><th>Action</th><th>What happens</th></tr>
+<tr><td>Short press (from spot view)</td><td>Opens the command menu</td></tr>
+<tr><td>Short press (in menu)</td><td>Cycles to next command</td></tr>
+<tr><td>Long press (hold ~1 second)</td><td>Sends the highlighted command</td></tr>
+<tr><td>Short press (on response screen)</td><td>Closes response, returns to spots</td></tr>
+<tr><td>10 seconds of no input</td><td>Menu auto-closes</td></tr>
+</table>
+
+<h3>Available commands</h3>
+<table>
+<tr><th>Command</th><th>Description</th></tr>
+<tr><td><code>sh/dx</code></td><td>Show recent DX spots (refreshes the spot list)</td></tr>
+<tr><td><code>sh/dx 20</code></td><td>Show last 20 spots</td></tr>
+<tr><td><code>sh/dx/ft8</code></td><td>Show FT8 spots only</td></tr>
+<tr><td><code>sh/dx/cw</code></td><td>Show CW spots only</td></tr>
+<tr><td><code>sh/dx/ssb</code></td><td>Show SSB spots only</td></tr>
+<tr><td><code>sh/wwv</code></td><td>Show solar / geomagnetic conditions</td></tr>
+<tr><td><code>sh/muf</code></td><td>Show MUF (Maximum Usable Frequency) info</td></tr>
+<tr><td><code>sh/qtc</code></td><td>Show QTC bulletins</td></tr>
+<tr><td><code>sh/ann</code></td><td>Show recent announcements</td></tr>
+<tr><td><code>sh/u</code></td><td>Show users connected to the cluster</td></tr>
+<tr><td><code>sh/c</code></td><td>Show cluster links (partner nodes)</td></tr>
+<tr><td><code>sh/h</code></td><td>Show help</td></tr>
+</table>
+</section>
+
+<!-- =========================================================================
+     SETUP MODE
+     ========================================================================= -->
+<section>
+<h2>Re-entering setup mode</h2>
+<p>
+If you need to change your settings (e.g. you changed your Wi-Fi password or
+want to use a different cluster server), you can force the device back into
+setup mode at any time:
+</p>
+<div class="info-box">
+<strong>Hold the BOOT button</strong> while pressing <strong>RESET</strong>
+(or while powering on). The device will boot into setup mode regardless of
+saved configuration.
+</div>
+<p>
+Setup mode also activates automatically if:
+</p>
+<ul>
+<li>The device boots with no Wi-Fi SSID saved (first boot after flashing).</li>
+<li>The configured Wi-Fi network cannot be reached within 30 seconds (e.g. wrong password, network down, you moved to a new location).</li>
+</ul>
+</section>
+
+<!-- =========================================================================
+     TROUBLESHOOTING
+     ========================================================================= -->
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+
+<details>
+<summary>Serial port not detected / no port in the list</summary>
+<div class="details-body">
+<h3>USB cable</h3>
+<p>Many USB cables are <strong>charge-only</strong> and don't carry data. Try a different cable — ideally one that you know works for data transfer (e.g. the cable that came with your phone).</p>
+<h3>USB hub</h3>
+<p>Plug directly into the computer, not through a hub. Some hubs block serial data.</p>
+<h3>ESP32-S3 boards: BOOT button trick</h3>
+<p>If you have an ESP32-S3 board (T-Display-S3, T-QT, T-HMI, T-Watch S3, Waveshare S3 Round) and the port doesn't appear:</p>
+<ol>
+<li>Unplug the board.</li>
+<li>Hold the <strong>BOOT</strong> button.</li>
+<li>Plug in the USB cable (keep holding BOOT).</li>
+<li>After 1–2 seconds, release BOOT.</li>
+<li>The port should now appear. Click Connect and select it.</li>
+</ol>
+<h3>Drivers</h3>
+<p>Most ESP32 boards use CP2102 or CH340 USB-to-serial chips. Modern OS versions include drivers, but if the port doesn't appear you may need to install:
+<br>CP2102: <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">Silicon Labs VCP drivers</a>
+<br>CH340: <a href="https://www.wch-ic.com/downloads/CH341SER_ZIP.html">WCH CH340 drivers</a></p>
+</div>
+</details>
+
+<details>
+<summary>Flashing fails or gets stuck</summary>
+<div class="details-body">
+<ul>
+<li>Try a different USB cable and port.</li>
+<li>Close other programs that might be using the serial port (PlatformIO, Arduino IDE, serial monitors).</li>
+<li>If flashing gets stuck at "Erasing", try the BOOT button trick above to force the board into download mode.</li>
+<li>If it fails repeatedly, refresh the page and try again. The ESP Web Tools library is generally reliable but occasional glitches happen.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Screen is blank after flashing</summary>
+<div class="details-body">
+<ul>
+<li><strong>Wrong board selected?</strong> Make sure you selected the correct board for your hardware. Each board has a different display configuration. If you flashed the wrong firmware, re-flash with the correct board.</li>
+<li><strong>T-Watch 2020:</strong> The display is powered by the AXP202 PMU. The firmware initializes it automatically, but if the battery is completely dead, plug in USB power and wait 10 seconds.</li>
+<li><strong>Backlight too dim:</strong> The default brightness is 220/255. If your screen seems dark, try looking at it from different angles — some IPS panels look dark head-on.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Can't connect to the setup Wi-Fi network</summary>
+<div class="details-body">
+<ul>
+<li>The setup AP name is <code>9M2PJU-DXCluster-XXXX</code> (last 4 characters are unique to your device). Look for a network starting with <code>9M2PJU-DXCluster</code>.</li>
+<li>It's an open network — no password needed to connect.</li>
+<li>If you don't see it, the device might not be in setup mode. Hold BOOT + press RESET to force it.</li>
+<li>On some phones, you need to turn off mobile data for the captive portal to appear.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Captive portal page doesn't pop up</summary>
+<div class="details-body">
+<p>If you connect to the setup Wi-Fi but no page appears automatically:</p>
+<ol>
+<li>Open any web browser on your phone.</li>
+<li>Type <code>http://192.168.4.1/</code> in the address bar.</li>
+<li>The configuration form should load.</li>
+</ol>
+<p>If that doesn't work either, try <code>http://192.168.4.1</code> (without the trailing slash) or navigate to any website — the captive portal redirect should kick in.</p>
+</div>
+</details>
+
+<details>
+<summary>Wi-Fi won't connect after configuration</summary>
+<div class="details-body">
+<ul>
+<li><strong>2.4 GHz only:</strong> ESP32 does not support 5 GHz Wi-Fi. If your router is dual-band, make sure you selected the 2.4 GHz network name.</li>
+<li><strong>Wrong password:</strong> Re-enter setup mode (hold BOOT + RESET) and try again. Wi-Fi passwords are case-sensitive.</li>
+<li><strong>WPA3:</strong> Some ESP32 firmware versions have trouble with WPA3-only networks. If your router supports WPA2/WPA3 mixed mode, use that.</li>
+<li><strong>Hidden SSID:</strong> The scan button won't find hidden networks. Type the SSID manually.</li>
+<li><strong>Too far from router:</strong> The device falls back to setup mode if Wi-Fi doesn't connect within 30 seconds. Move closer to your router.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Connected to Wi-Fi but no spots appearing</summary>
+<div class="details-body">
+<ul>
+<li><strong>Check the connection dot:</strong> If it's orange, the device is still connecting to the cluster. If it stays orange for more than a minute, the cluster server might be down or unreachable.</li>
+<li><strong>Check the cluster host and port:</strong> Re-enter setup mode and verify the settings. Default is <code>9m2pju.hamradio.my</code> port <code>7300</code>.</li>
+<li><strong>Callsign rejected:</strong> Some clusters only accept registered users. The default placeholder is <code>N0CALL</code> — make sure you entered your real callsign.</li>
+<li><strong>Cluster is quiet:</strong> If no one is spotting, there's nothing to show. Try sending <code>sh/dx</code> via the button menu to request recent spots.</li>
+<li><strong>Firewall:</strong> Some networks block port 7300. Try a different Wi-Fi network or check with your network admin.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Button menu doesn't work</summary>
+<div class="details-body">
+<ul>
+<li>The BOOT button (GPIO 0) is used for the menu. On most boards this is the button labeled <strong>BOOT</strong> or <strong>IO0</strong>.</li>
+<li>The menu only works in <strong>normal mode</strong> (when the device is showing spots). It doesn't work in setup mode.</li>
+<li><strong>Short press</strong> = quick click (less than 1 second). <strong>Long press</strong> = hold for at least 1 second.</li>
+<li>If the button is hard to reach on your board (e.g. inside a case), you may need to wire an external button to GPIO 0.</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>Forgot settings / want to start over</summary>
+<div class="details-body">
+<p>Hold the <strong>BOOT</strong> button while pressing <strong>RESET</strong>. The device boots into setup mode and you can enter new settings. The old settings will be overwritten when you save.</p>
+<p>To completely wipe all settings, re-flash the firmware using the web flasher — this erases NVS and starts fresh.</p>
+</div>
+</details>
+</section>
+
+<!-- =========================================================================
+     FAQ
+     ========================================================================= -->
+<section>
+<h2>FAQ</h2>
+
+<details>
+<summary>What is a DX Cluster?</summary>
+<div class="details-body">
+<p>
+A DX Cluster is a network of servers that relay "spots" — real-time reports of
+interesting amateur radio activity. When someone hears a rare station, they
+post a spot to the cluster, and it's immediately distributed to all connected
+operators. A spot looks like:
+</p>
+<div class="ascii">DX de 9M2XYZ:    14.074  JA1ABC     FT8, strong signal in Europe    1234Z</div>
+<p>
+This tells you: station <code>9M2XYZ</code> spotted <code>JA1ABC</code> on
+frequency <code>14.074 MHz</code> (20m band), the mode is FT8, the signal was
+strong in Europe, and the spot was posted at <code>12:34 UTC</code>.
+</p>
+<p>
+This device connects to a DX cluster server and displays these spots on its
+screen in real time, so you can see what's being heard around the world
+without running a computer or telnet client.
+</p>
+</div>
+</details>
+
+<details>
+<summary>What cluster servers can I use?</summary>
+<div class="details-body">
+<p>
+Any DXSpider-compatible cluster that speaks the standard telnet protocol on
+port 7300. This includes:
+</p>
+<ul>
+<li><a href="https://github.com/9M2PJU/9M2PJU-DXSpider-Docker">9M2PJU DXSpider Docker</a> — <code>9m2pju.hamradio.my:7300</code></li>
+<li>Any public DXSpider node (search for "DX cluster list" online)</li>
+<li>CC Cluster and AR-Cluster servers (mostly compatible)</li>
+</ul>
+<p>
+The default host is <code>9m2pju.hamradio.my</code> but you can point the
+device at any cluster server via the web admin UI.
+</p>
+</div>
+</details>
+
+<details>
+<summary>Does it work with 5 GHz Wi-Fi?</summary>
+<div class="details-body">
+<p>No. The ESP32 only supports 2.4 GHz Wi-Fi (802.11 b/g/n). If your router is dual-band (2.4 + 5 GHz), connect to the 2.4 GHz network name.</p>
+</div>
+</details>
+
+<details>
+<summary>Does it need a battery?</summary>
+<div class="details-body">
+<p>No. The device runs on USB power. Boards with batteries (T-Watch, M5StickC Plus, M5Stack Core2) will also run on battery — the firmware doesn't do anything special with battery power, but the display and Wi-Fi will work normally.</p>
+</div>
+</details>
+
+<details>
+<summary>Can I change the settings without re-flashing?</summary>
+<div class="details-body">
+<p>Yes. Hold the BOOT button while pressing RESET to enter setup mode. The web admin UI lets you change Wi-Fi, callsign, cluster server, and all other settings. Changes are saved to NVS (flash memory) and persist across reboots.</p>
+</div>
+</details>
+
+<details>
+<summary>Is my callsign/password sent securely?</summary>
+<div class="details-body">
+<p>The DX cluster protocol is plain telnet (unencrypted). This is standard for amateur radio DX clusters. The callsign is sent in plain text. The callsign password (if your cluster requires one) is also sent in plain text. This is the same as any telnet DX cluster client. The web admin UI (configuration page) is local — it only travels between your phone and the ESP32 over the setup Wi-Fi, not over the internet.</p>
+</div>
+</details>
+
+<details>
+<summary>How much flash does the firmware use?</summary>
+<div class="details-body">
+<p>Typical flash usage is 25–30% on ESP32-S3 (16 MB flash) and 65–75% on ESP32 (4 MB flash). RAM usage is about 15% (48 KB of 320 KB). There's plenty of room for future features.</p>
+</div>
+</details>
+
+<details>
+<summary>Can I build from source?</summary>
+<div class="details-body">
+<p>Yes. The project uses PlatformIO. Clone the repository, copy <code>include/config.example.h</code> to <code>include/config.h</code>, edit your defaults, and run <code>pio run -e &lt;your-board&gt;</code>. See the Developer Guide in the <code>docs/</code> folder for full instructions.</p>
+</div>
+</details>
+
+<details>
+<summary>How do I add support for a board that's not listed?</summary>
+<div class="details-body">
+<p>It takes about 30 lines of code. You need to create a board configuration file (LovyanGFX subclass with the display pins), add an entry in BoardConfig.h, and add a PlatformIO environment. See "Adding a New Board" in the <code>docs/</code> folder for a step-by-step guide.</p>
+</div>
+</details>
+</section>
+
+<!-- =========================================================================
+     FOOTER
+     ========================================================================= -->
+<footer>
+<p>9M2PJU ESP32 DX Cluster Client</p>
+<div class="support">
+<a href="https://buymeacoffee.com/9m2pju" class="bmc">Buy Me a Coffee</a>
+<a href="https://paypal.me/9m2pju" class="pp">PayPal</a>
+</div>
+</footer>
+
+</div><!-- /container -->
+
+<script type="module" src="https://unpkg.com/esp-web-tools@10.2.1/dist/web/install-button.js?module"></script>
+<script>
+// Check Web Serial support and show warning if unsupported
+(function() {
+  if (!('serial' in navigator)) {
+    const warn = document.createElement('div');
+    warn.style.cssText = 'background:#1c1408;border:1px solid #f59e0b;border-radius:8px;padding:14px;margin:20px 0;font-size:.9rem;color:#fbbf24;text-align:center';
+    warn.innerHTML = '<strong>Your browser does not support Web Serial.</strong><br>You need Chrome, Edge, or Opera (desktop or Android) to flash firmware from this page.<br>Firefox and Safari are not supported.';
+    document.querySelector('.container').insertBefore(warn, document.querySelector('.container').children[1]);
+  }
+})();
+
+const boards = [
+  {id:"lilygo-tdisplay-s3",name:"LilyGO T-Display-S3",chip:"ESP32-S3",display:"1.9\" ST7789 320x170",manifest:"manifests/lilygo-tdisplay-s3.json"},
+  {id:"lilygo-tdisplay-s3-amoled",name:"LilyGO T-Display-S3 AMOLED",chip:"ESP32-S3",display:"1.91\" RM67162 536x240",manifest:"manifests/lilygo-tdisplay-s3-amoled.json"},
+  {id:"lilygo-tdisplay",name:"LilyGO T-Display",chip:"ESP32",display:"1.14\" ST7789 240x135",manifest:"manifests/lilygo-tdisplay.json"},
+  {id:"lilygo-t-qt",name:"LilyGO T-QT",chip:"ESP32-S3",display:"0.8\" GC9A01 128x128",manifest:"manifests/lilygo-t-qt.json"},
+  {id:"lilygo-t-hmi",name:"LilyGO T-HMI",chip:"ESP32-S3",display:"2.4\" ILI9341 320x240",manifest:"manifests/lilygo-t-hmi.json"},
+  {id:"m5stickc-plus",name:"M5Stack StickC Plus / Plus2",chip:"ESP32-PICO",display:"1.14\" ST7789 240x135",manifest:"manifests/m5stickc-plus.json"},
+  {id:"m5stack-core",name:"M5Stack Basic / Core / Fire",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core.json"},
+  {id:"m5stack-core2",name:"M5Stack Core2 / CoreS3",chip:"ESP32",display:"2.0\" ILI9341 320x240",manifest:"manifests/m5stack-core2.json"},
+  {id:"sunton-2432s028",name:"Sunton ESP32-2432S028R (CYD)",chip:"ESP32",display:"2.8\" ILI9341 320x240",manifest:"manifests/sunton-2432s028.json"},
+  {id:"waveshare-s3-round",name:"Waveshare S3 Round 1.28\"",chip:"ESP32-S3",display:"1.28\" GC9A01 240x240",manifest:"manifests/waveshare-s3-round.json"},
+  {id:"lilygo-t-watch-2020",name:"LilyGO T-Watch 2020",chip:"ESP32",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-2020.json"},
+  {id:"lilygo-t-watch-s3",name:"LilyGO T-Watch S3",chip:"ESP32-S3",display:"1.54\" ST7789 240x240",manifest:"manifests/lilygo-t-watch-s3.json"},
+  {id:"lilygo-tdeck",name:"LilyGO T-Deck",chip:"ESP32-S3",display:"2.8\" ST7789 320x240",manifest:"manifests/lilygo-tdeck.json"},
+];
+
+const container = document.getElementById("boards");
+boards.forEach(b => {
+  const div = document.createElement("div");
+  div.className = "board-card";
+  div.innerHTML = `
+    <h3>${b.name}</h3>
+    <div class="info">
+      <span class="chip">${b.chip}</span>
+      <span class="chip">${b.display}</span>
+    </div>
+  `;
+  const btn = document.createElement("esp-web-install-button");
+  btn.setAttribute("manifest", b.manifest);
+  div.appendChild(btn);
+  container.appendChild(div);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+name: Build and Publish Web Flasher
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'docs/**'
+      - 'platformio.ini'
+      - '.github/workflows/build-flash.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - lilygo-tdisplay-s3
+          - lilygo-tdisplay-s3-amoled
+          - lilygo-tdisplay
+          - lilygo-t-qt
+          - lilygo-t-hmi
+          - m5stickc-plus
+          - m5stack-core
+          - m5stack-core2
+          - sunton-2432s028
+          - waveshare-s3-round
+          - lilygo-t-watch-2020
+          - lilygo-t-watch-s3
+          - lilygo-tdeck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install platformio esptool
+
+      - name: Create config.h for build
+        run: cp include/config.example.h include/config.h
+
+      - name: Build ${{ matrix.env }}
+        run: pio run -e ${{ matrix.env }}
+
+      - name: Find boot_app0.bin
+        id: boot_app0
+        run: |
+          # boot_app0.bin is part of the Arduino framework, not the build output
+          FOUND=$(find ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 2>/dev/null | head -1)
+          if [ -n "$FOUND" ]; then
+            cp "$FOUND" .pio/build/${{ matrix.env }}/boot_app0.bin
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "Found boot_app0.bin at $FOUND"
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "WARNING: boot_app0.bin not found"
+          fi
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.env }}
+          path: |
+            .pio/build/${{ matrix.env }}/firmware.bin
+            .pio/build/${{ matrix.env }}/bootloader.bin
+            .pio/build/${{ matrix.env }}/partitions.bin
+            .pio/build/${{ matrix.env }}/boot_app0.bin
+          retention-days: 1
+          if-no-files-found: ignore
+
+  publish:
+    name: Package and publish to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Download all firmware artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Restore build directory structure
+        run: |
+          # download-artifact flattens the structure; we need to reconstruct
+          # the .pio/build/<env>/ layout for the packaging script
+          python3 << 'PYEOF'
+          import os, shutil, pathlib
+
+          envs = [
+              "lilygo-tdisplay-s3", "lilygo-tdisplay-s3-amoled",
+              "lilygo-tdisplay", "lilygo-t-qt", "lilygo-t-hmi",
+              "m5stickc-plus", "m5stack-core", "m5stack-core2",
+              "sunton-2432s028", "waveshare-s3-round",
+              "lilygo-t-watch-2020", "lilygo-t-watch-s3", "lilygo-tdeck",
+          ]
+
+          # Artifacts are downloaded as artifacts/firmware-<env>/{firmware,bootloader,partitions,boot_app0}.bin
+          # We need them at .pio/build/<env>/
+          for env in envs:
+              src_dir = f"artifacts/firmware-{env}"
+              dst_dir = f".pio/build/{env}"
+              os.makedirs(dst_dir, exist_ok=True)
+              for fname in ["firmware.bin", "bootloader.bin", "partitions.bin", "boot_app0.bin"]:
+                  src = os.path.join(src_dir, fname)
+                  if os.path.exists(src):
+                      shutil.copy(src, os.path.join(dst_dir, fname))
+
+          print("Build directory structure restored")
+          PYEOF
+
+      - name: Prepare site directory
+        run: |
+          mkdir -p site/manifests site/firmware site/assets
+
+      - name: Copy index.html and assets
+        run: |
+          cp docs/index.html site/index.html
+          cp -r docs/assets/* site/assets/
+
+      - name: Package firmware + create manifests
+        run: |
+          python3 << 'PYEOF'
+          import json, os, shutil
+
+          boards = {
+              "lilygo-tdisplay-s3":         {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdisplay-s3-amoled":  {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdisplay":            {"chip": "ESP32",     "bl_offset": 0x1000},
+              "lilygo-t-qt":                {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-t-hmi":               {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "m5stickc-plus":              {"chip": "ESP32",     "bl_offset": 0x1000},
+              "m5stack-core":               {"chip": "ESP32",     "bl_offset": 0x1000},
+              "m5stack-core2":              {"chip": "ESP32",     "bl_offset": 0x1000},
+              "sunton-2432s028":            {"chip": "ESP32",     "bl_offset": 0x1000},
+              "waveshare-s3-round":         {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-t-watch-2020":        {"chip": "ESP32",     "bl_offset": 0x1000},
+              "lilygo-t-watch-s3":          {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdeck":               {"chip": "ESP32-S3",  "bl_offset": 0x0},
+          }
+
+          # boot_app0.bin is the same for all boards — find it from any env
+          boot_app0_src = None
+          for env in boards:
+              candidate = f".pio/build/{env}/boot_app0.bin"
+              if os.path.exists(candidate):
+                  boot_app0_src = candidate
+                  break
+
+          if not boot_app0_src:
+              raise Exception("boot_app0.bin not found in any build artifact! "
+                              "The build jobs must upload it alongside firmware.bin.")
+
+          for env, info in boards.items():
+              build_dir = f".pio/build/{env}"
+              if not os.path.isdir(build_dir):
+                  print(f"WARNING: build dir for {env} not found, skipping")
+                  continue
+
+              fw_dir = f"site/firmware/{env}"
+              os.makedirs(fw_dir, exist_ok=True)
+
+              # ESP Web Tools manifest paths are RELATIVE to the manifest file.
+              # Manifests are at: site/manifests/<env>.json
+              # Firmware is at:   site/firmware/<env>/*.bin
+              # So paths must be: ../firmware/<env>/*.bin
+              parts = []
+
+              bl_src = f"{build_dir}/bootloader.bin"
+              if os.path.exists(bl_src):
+                  shutil.copy(bl_src, f"{fw_dir}/bootloader.bin")
+                  parts.append({"path": f"../firmware/{env}/bootloader.bin", "offset": info["bl_offset"]})
+
+              pt_src = f"{build_dir}/partitions.bin"
+              if os.path.exists(pt_src):
+                  shutil.copy(pt_src, f"{fw_dir}/partitions.bin")
+                  parts.append({"path": f"../firmware/{env}/partitions.bin", "offset": 0x8000})
+
+              shutil.copy(boot_app0_src, f"{fw_dir}/boot_app0.bin")
+              parts.append({"path": f"../firmware/{env}/boot_app0.bin", "offset": 0xe000})
+
+              fw_src = f"{build_dir}/firmware.bin"
+              if os.path.exists(fw_src):
+                  shutil.copy(fw_src, f"{fw_dir}/firmware.bin")
+                  parts.append({"path": f"../firmware/{env}/firmware.bin", "offset": 0x10000})
+
+              manifest = {
+                  "name": f"9M2PJU DX Cluster Client — {env}",
+                  "version": "1.0.0",
+                  "new_install_prompt_erase": True,
+                  "builds": [{"chipFamily": info["chip"], "parts": parts}]
+              }
+
+              manifest_path = f"site/manifests/{env}.json"
+              with open(manifest_path, "w") as f:
+                  json.dump(manifest, f, indent=2)
+              print(f"Created manifest: {manifest_path}")
+
+          print("All manifests created successfully")
+          PYEOF
+
+      - name: List site contents
+        run: find site -type f | sort
+
+      - name: Generate build summary
+        run: |
+          echo "## Web Flasher Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Boards built" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Board | Firmware size |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          python3 -c "
+          import os
+          envs = [
+              'lilygo-tdisplay-s3', 'lilygo-tdisplay-s3-amoled',
+              'lilygo-tdisplay', 'lilygo-t-qt', 'lilygo-t-hmi',
+              'm5stickc-plus', 'm5stack-core', 'm5stack-core2',
+              'sunton-2432s028', 'waveshare-s3-round',
+              'lilygo-t-watch-2020', 'lilygo-t-watch-s3', 'lilygo-tdeck',
+          ]
+          for env in envs:
+              fw = f'site/firmware/{env}/firmware.bin'
+              if os.path.exists(fw):
+                  size = os.path.getsize(fw)
+                  print(f'| {env} | {size:,} bytes ({size//1024} KB) |')
+          "
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Manifests created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          ls -1 site/manifests/*.json | xargs -I{} basename {} >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

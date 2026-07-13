@@ -1,0 +1,200 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build firmware for release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install platformio esptool
+
+      - name: Create config.h for build
+        run: cp include/config.example.h include/config.h
+
+      - name: Build all environments
+        run: pio run
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Package firmware binaries
+        run: |
+          python3 << 'PYEOF'
+          import json, os, shutil, zipfile, pathlib
+
+          version = "${{ steps.version.outputs.version }}"
+
+          boards = {
+              "lilygo-tdisplay-s3":         {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdisplay-s3-amoled":  {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdisplay":            {"chip": "ESP32",     "bl_offset": 0x1000},
+              "lilygo-t-qt":                {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-t-hmi":               {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "m5stickc-plus":              {"chip": "ESP32",     "bl_offset": 0x1000},
+              "m5stack-core":               {"chip": "ESP32",     "bl_offset": 0x1000},
+              "m5stack-core2":              {"chip": "ESP32",     "bl_offset": 0x1000},
+              "sunton-2432s028":            {"chip": "ESP32",     "bl_offset": 0x1000},
+              "waveshare-s3-round":         {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-t-watch-2020":        {"chip": "ESP32",     "bl_offset": 0x1000},
+              "lilygo-t-watch-s3":          {"chip": "ESP32-S3",  "bl_offset": 0x0},
+              "lilygo-tdeck":               {"chip": "ESP32-S3",  "bl_offset": 0x0},
+          }
+
+          # Find boot_app0.bin
+          boot_app0 = None
+          for p in pathlib.Path.home().glob(".platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin"):
+              boot_app0 = str(p)
+              break
+          if not boot_app0:
+              raise Exception("boot_app0.bin not found")
+
+          os.makedirs("release", exist_ok=True)
+
+          # Create a combined zip for each board with flashable binaries
+          for env, info in boards.items():
+              build_dir = f".pio/build/{env}"
+              if not os.path.isdir(build_dir):
+                  print(f"WARNING: build dir for {env} not found, skipping")
+                  continue
+
+              # Create a zip with all flashable parts + a flash script
+              zip_path = f"release/{env}-{version}.zip"
+              with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                  # Bootloader
+                  bl = f"{build_dir}/bootloader.bin"
+                  if os.path.exists(bl):
+                      zf.write(bl, "bootloader.bin")
+
+                  # Partitions
+                  pt = f"{build_dir}/partitions.bin"
+                  if os.path.exists(pt):
+                      zf.write(pt, "partitions.bin")
+
+                  # boot_app0
+                  zf.write(boot_app0, "boot_app0.bin")
+
+                  # Firmware
+                  fw = f"{build_dir}/firmware.bin"
+                  if os.path.exists(fw):
+                      zf.write(fw, "firmware.bin")
+
+                  # Flash command file
+                  flash_cmd = f"esptool.py --chip {info['chip']} write_flash"
+                  if os.path.exists(bl):
+                      flash_cmd += f" {info['bl_offset']} bootloader.bin"
+                  flash_cmd += " 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin"
+                  zf.writestr("flash.sh", f"#!/bin/sh\n# Flash {env} {version}\n# {info['chip']}\n{flash_cmd}\n")
+
+                  # Readme
+                  zf.writestr("README.txt",
+                      f"9M2PJU ESP32 DX Cluster Client\n"
+                      f"Board: {env}\n"
+                      f"Version: {version}\n"
+                      f"Chip: {info['chip']}\n\n"
+                      f"To flash with esptool.py:\n"
+                      f"  esptool.py --port /dev/ttyUSB0 --chip {info['chip']} \\\n"
+                      f"    write_flash {info['bl_offset']} bootloader.bin \\\n"
+                      f"    0x8000 partitions.bin \\\n"
+                      f"    0xe000 boot_app0.bin \\\n"
+                      f"    0x10000 firmware.bin\n\n"
+                      f"Or use the web flasher:\n"
+                      f"  https://9m2pju.github.io/9M2PJU-ESP32-DX-Cluster-Client/\n")
+
+              print(f"Created: {zip_path}")
+
+          # Also create a single zip with all boards
+          all_zip = f"release/all-boards-{version}.zip"
+          with zipfile.ZipFile(all_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+              for env in boards:
+                  build_dir = f".pio/build/{env}"
+                  if not os.path.isdir(build_dir):
+                      continue
+                  fw = f"{build_dir}/firmware.bin"
+                  if os.path.exists(fw):
+                      zf.write(fw, f"{env}/firmware.bin")
+                  bl = f"{build_dir}/bootloader.bin"
+                  if os.path.exists(bl):
+                      zf.write(bl, f"{env}/bootloader.bin")
+                  pt = f"{build_dir}/partitions.bin"
+                  if os.path.exists(pt):
+                      zf.write(pt, f"{env}/partitions.bin")
+                  zf.write(boot_app0, f"{env}/boot_app0.bin")
+          print(f"Created: {all_zip}")
+
+          # Generate release notes with build info
+          with open("release/release-notes.md", "w") as f:
+              f.write(f"# 9M2PJU ESP32 DX Cluster Client {version}\n\n")
+              f.write("## Firmware downloads\n\n")
+              f.write("| Board | File | Chip |\n")
+              f.write("| :--- | :--- | :--- |\n")
+              for env, info in boards.items():
+                  build_dir = f".pio/build/{env}"
+                  if not os.path.isdir(build_dir):
+                      continue
+                  fw = os.path.join(build_dir, "firmware.bin")
+                  size = os.path.getsize(fw) if os.path.exists(fw) else 0
+                  f.write(f"| {env} | `{env}-{version}.zip` | {info['chip']} ({size//1024}KB) |\n")
+              f.write(f"\n| All boards | `all-boards-{version}.zip` | — |\n\n")
+              f.write("## Flashing\n\n")
+              f.write("### Option 1: Web Flasher (recommended)\n\n")
+              f.write("Open https://9m2pju.github.io/9M2PJU-ESP32-DX-Cluster-Client/ in Chrome or Edge,\n")
+              f.write("select your board, and click Install.\n\n")
+              f.write("### Option 2: esptool.py\n\n")
+              f.write("Download the zip for your board, extract it, then:\n\n")
+              f.write("```sh\n")
+              f.write("esptool.py --port /dev/ttyUSB0 --chip ESP32-S3 \\\n")
+              f.write("  write_flash 0x0 bootloader.bin \\\n")
+              f.write("  0x8000 partitions.bin \\\n")
+              f.write("  0xe000 boot_app0.bin \\\n")
+              f.write("  0x10000 firmware.bin\n")
+              f.write("```\n\n")
+              f.write("(Use `0x1000` instead of `0x0` for the bootloader offset on original ESP32 boards.)\n")
+
+          print("Release notes generated")
+          PYEOF
+
+      - name: List release artifacts
+        run: find release -type f | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body_path: release/release-notes.md
+          files: |
+            release/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
