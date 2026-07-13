@@ -58,9 +58,23 @@ protocol on port 7300 (DXSpider, CC Cluster, AR-Cluster, etc.).
   compact single-spot view with a connection ring. The display title shows
   "9M2PJU DX Cluster Client" on all screens.
 
+- **Themed display** — navy blue header bar with yellow text (matching the
+  9M2PJU LoRa APRS Tracker theme), cyan body text, band-coloured frequency
+  text, yellow callsigns, grey spotter/comment, and green/red connection
+  status indicators.
+
+- **Battery monitoring** — battery voltage and charge percentage shown in
+  the display header on boards with a battery ADC pin. Colour-coded:
+  green (>=50%), yellow (20-49%), red (<20%). Updated every 30 seconds.
+
 - **Button command menu** — press the BOOT button to open a menu of common
   DX cluster commands (`sh/dx`, `sh/wwv`, `sh/u`, `sh/c`, etc.). Tap to
   cycle, hold to send. Response text is displayed on screen.
+
+- **Settings menu** — triple-click the BOOT button to access on-device
+  settings: enable Wi-Fi AP (reboot to setup mode), sleep (deep sleep to
+  save power), restart, and display brightness (on boards with backlight).
+  Brightness is saved to NVS and restored on boot.
 
 - **Automatic reconnect** for both Wi-Fi and telnet. If your Wi-Fi drops or
   the cluster server restarts, the device reconnects automatically.
@@ -68,7 +82,8 @@ protocol on port 7300 (DXSpider, CC Cluster, AR-Cluster, etc.).
 - **UTC clock** synced via NTP, displayed in the header bar.
 
 - **Band colour coding** — spot frequencies are colour-coded by band for
-  quick visual scanning.
+  quick visual scanning: 160m magenta, 80m cyan, 40m green, 20m yellow,
+  15m orange, 10m red-blue, 6m red, VHF grey, UHF teal, SHF white.
 
 - **Captive portal** — when you connect to the device's setup Wi-Fi, the
   configuration page pops up automatically on most phones. No need to
@@ -236,10 +251,10 @@ pio device monitor -e lilygo-tdisplay-s3
 
 ```
 +------------------------------+
-| 9M2PJU DX Cluster  o  12:34Z |
-+------------------------------+
-| |14.074  JA1ABC               |
-|  de 9M2XYZ  FT8, strong in EU |
+| B:4.15V 85% 9M2PJU DX o 12:34Z|  navy blue header, yellow text
++------------------------------+  battery (green/yellow/red), green=connected
+| |14.074  JA1ABC               |  band-coloured freq, yellow call
+|  de 9M2XYZ  FT8, strong in EU |  grey spotter/comment
 | |21.300  VK2DEF               |
 |  de 9M2ABC  big signal        |
 | | 7.025  DL1AAA               |
@@ -252,10 +267,11 @@ pio device monitor -e lilygo-tdisplay-s3
 ```
         9M2PJU DX Cluster
          12:34Z
-      (   o   )
-       14.074
-       JA1ABC
-       de 9M2XYZ
+          B:85%              battery (if available)
+      (   o   )              green ring = connected
+       14.074                band-coloured
+       JA1ABC                yellow
+       de 9M2XYZ             grey
 ```
 
 ### Setup mode (all panels)
@@ -323,6 +339,29 @@ DX cluster commands without a computer or telnet client.
 
 ---
 
+## Settings menu (triple-click)
+
+**Triple-click** the BOOT button (3 quick presses within 800ms) from the
+normal spot view to open the settings menu.
+
+| Action | Result |
+|:---|:---|
+| Triple-click (from spot view) | Opens the settings menu |
+| Short press (in menu) | Cycles to next setting |
+| Long press (~1s hold) | Selects the highlighted setting |
+| 10s no input | Auto-closes, returns to spots |
+
+### Available settings
+
+| Setting | Description |
+| :--- | :--- |
+| **WiFi AP** | Clears Wi-Fi config and reboots into setup mode (captive portal). Confirm with Yes/No. |
+| **Sleep** | Enters deep sleep mode to save power. Wake by pressing BOOT button. Confirm with Yes/No. |
+| **Restart** | Soft reboots the ESP32. Confirm with Yes/No. |
+| **Brightness** | Cycles through 4 backlight levels (64/128/192/255). Saved to NVS and restored on boot. Only on boards with backlight. |
+
+---
+
 ## Configuration
 
 ### Web admin UI fields
@@ -386,6 +425,8 @@ src/
   DxClusterClient.{h,cpp}   Wi-Fi + telnet + spot ring buffer + command send
   DxDisplay.{h,cpp}         Board-agnostic UI renderer (LovyanGFX)
   CommandMenu.h             One-button menu for DX cluster commands
+  SettingsMenu.h            Triple-click settings menu (WiFi AP/sleep/restart/brightness)
+  Battery.h                 ADC-based battery voltage + percentage monitoring
   BoardConfig.h             Selects the board via -D BOARD_*
   boards/                   Per-board LovyanGFX panel/bus/pin configs
     lilygo_tdisplay_s3.h

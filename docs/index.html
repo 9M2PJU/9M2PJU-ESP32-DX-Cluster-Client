@@ -62,9 +62,12 @@
     "22 ESP32 boards supported with built-in displays",
     "Live DX spots from any DXSpider cluster",
     "Button command menu for cluster commands",
+    "Triple-click settings menu (WiFi AP, sleep, restart, brightness)",
+    "Battery voltage and percentage monitoring on supported boards",
+    "Themed display (navy blue header, band-coloured spots)",
     "Automatic Wi-Fi and telnet reconnect",
     "UTC clock via NTP",
-    "Band colour coding",
+    "Band colour coding (160m-70cm)",
     "Adaptive UI for different screen sizes"
   ],
   "screenshot": "https://esp32dxcluster.hamradio.my/assets/logo.png"
@@ -415,13 +418,13 @@ After configuration, the device connects to your Wi-Fi and the DX cluster.
 The display shows:
 </p>
 <ul>
-<li><strong>Header bar</strong> — "9M2PJU DX Cluster Client" (or a truncated version on small screens), a connection status dot (cyan = connected, orange = connecting), and the UTC clock.</li>
-<li><strong>Spot list</strong> — scrolling list of recent DX spots, newest first. Each spot shows the frequency (colour-coded by band), DX callsign, spotter callsign, and comment.</li>
+<li><strong>Header bar</strong> — navy blue background with yellow text. Shows battery voltage/percentage (on boards with battery ADC, colour-coded: green/yellow/red), "9M2PJU DX Cluster Client" (truncated on small screens), a connection status dot (green = connected, red = disconnected), and the UTC clock.</li>
+<li><strong>Spot list</strong> — scrolling list of recent DX spots, newest first. Each spot shows the frequency (colour-coded by band), DX callsign (yellow), spotter callsign (grey), and comment (grey).</li>
 </ul>
 
 <h3>Wide displays (T-Display-S3, M5Stack Core, Sunton CYD, T-HMI)</h3>
 <div class="ascii">+------------------------------+
-| 9M2PJU DX Cluster  o  12:34Z |
+| B:4.15V 85% 9M2PJU DX o 12:34Z|
 +------------------------------+
 | |14.074  JA1ABC               |
 |  de 9M2XYZ  FT8, strong in EU |
@@ -434,6 +437,7 @@ The display shows:
 <h3>Small / round displays (T-QT, Waveshare round, T-Watch)</h3>
 <div class="ascii">      9M2PJU DX Cluster
          12:34Z
+          B:85%
       (   o   )
        14.074
        JA1ABC
@@ -469,6 +473,20 @@ a computer or telnet client.
 <tr><td><code>sh/u</code></td><td>Show users connected to the cluster</td></tr>
 <tr><td><code>sh/c</code></td><td>Show cluster links (partner nodes)</td></tr>
 <tr><td><code>sh/h</code></td><td>Show help</td></tr>
+</table>
+
+<h3>Settings menu (triple-click)</h3>
+<p>
+<strong>Triple-click</strong> the BOOT button (3 quick presses within 800ms) from
+the spot view to open the settings menu. This gives you quick access to common
+operations without re-flashing or entering setup mode:
+</p>
+<table>
+<tr><th>Setting</th><th>Description</th></tr>
+<tr><td><strong>WiFi AP</strong></td><td>Clears Wi-Fi config and reboots into setup mode (captive portal). Confirm with Yes/No.</td></tr>
+<tr><td><strong>Sleep</strong></td><td>Enters deep sleep to save power. Wake by pressing BOOT. Confirm with Yes/No.</td></tr>
+<tr><td><strong>Restart</strong></td><td>Soft reboots the ESP32. Confirm with Yes/No.</td></tr>
+<tr><td><strong>Brightness</strong></td><td>Cycles through 4 backlight levels (64/128/192/255). Saved to NVS, restored on boot. Boards with backlight only.</td></tr>
 </table>
 </section>
 
@@ -681,6 +699,7 @@ device at any cluster server via the web admin UI.
 <summary>Does it need a battery?</summary>
 <div class="details-body">
 <p>No. The device runs on USB power. Boards with batteries (T-Watch, M5StickC Plus, M5Stack Core2) will also run on battery — the firmware doesn't do anything special with battery power, but the display and Wi-Fi will work normally.</p>
+<p>On boards with a battery ADC pin (T-Display-S3, T-Display, T-QT, T-HMI, T-Deck, Sunton CYD, Heltec boards), the display header shows battery voltage and charge percentage, colour-coded green/yellow/red. Boards with PMU-based battery (M5StickC, M5Stack, T-Watch) don't show battery info yet — the ADC pin is set to 255 (not supported) in the current firmware.</p>
 </div>
 </details>
 
