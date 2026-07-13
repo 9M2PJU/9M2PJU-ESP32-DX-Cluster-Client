@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://esp32dxcluster.hamradio.my/sitemap.xml

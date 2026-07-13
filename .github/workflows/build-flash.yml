@@ -154,6 +154,8 @@ jobs:
           cp docs/index.html site/index.html
           cp -r docs/assets/* site/assets/
           cp docs/CNAME site/CNAME
+          cp docs/robots.txt site/robots.txt
+          cp docs/sitemap.xml site/sitemap.xml
 
       - name: Package firmware + create manifests
         run: |

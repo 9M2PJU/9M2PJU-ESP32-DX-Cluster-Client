@@ -3,16 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>9M2PJU ESP32 DX Cluster Client — Web Flasher</title>
-<meta name="description" content="Flash the 9M2PJU ESP32 DX Cluster Client firmware to your ESP32 board directly from your browser. No software install needed.">
-<meta property="og:title" content="9M2PJU ESP32 DX Cluster Client — Web Flasher">
-<meta property="og:description" content="Flash firmware to your ESP32 board directly from your browser. Supports 22 boards including LilyGO T-Display-S3, M5Stack, T-Watch, Heltec WiFi Kit/LoRa 32, and more.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="assets/logo.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="9M2PJU ESP32 DX Cluster Client — Web Flasher">
-<meta name="twitter:description" content="Flash firmware to your ESP32 board directly from your browser.">
+<title>ESP32 DX Cluster Client — Web Flasher | 9M2PJU</title>
+<meta name="description" content="Flash the ESP32 DX Cluster Client firmware directly from your browser. No software install needed. Supports 22 ESP32 boards with built-in displays: LilyGO T-Display-S3, M5Stack, Heltec WiFi Kit 32, T-Watch, and more. Connects to any DXSpider cluster over Wi-Fi.">
+<meta name="keywords" content="ESP32, DX Cluster, amateur radio, ham radio, DX spots, DXSpider, web flasher, LilyGO, M5Stack, Heltec, LovyanGFX, ESP Web Tools, firmware, telnet cluster, 9M2PJU">
+<meta name="author" content="9M2PJU">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="https://esp32dxcluster.hamradio.my/">
 <link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="ESP32 DX Cluster Client — Browser Web Flasher">
+<meta property="og:description" content="Flash firmware to your ESP32 board directly from your browser. Supports 22 boards including LilyGO T-Display-S3, M5Stack, Heltec WiFi Kit/LoRa 32, T-Watch, and more. No software install needed.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://esp32dxcluster.hamradio.my/">
+<meta property="og:image" content="https://esp32dxcluster.hamradio.my/assets/logo.png">
+<meta property="og:site_name" content="ESP32 DX Cluster Client">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ESP32 DX Cluster Client — Browser Web Flasher">
+<meta name="twitter:description" content="Flash firmware to your ESP32 board directly from your browser. 22 boards supported. No software install needed.">
+<meta name="twitter:image" content="https://esp32dxcluster.hamradio.my/assets/logo.png">
+<meta name="twitter:site" content="@9M2PJU">
+<meta name="twitter:creator" content="@9M2PJU">
+
+<!-- Structured data: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "9M2PJU ESP32 DX Cluster Client",
+  "description": "A standalone DX Cluster client for ESP32 boards with built-in displays. Connects to any DXSpider-compatible cluster server over Wi-Fi, receives live DX spots, and displays them on screen. Supports 22 ESP32 boards including LilyGO, M5Stack, Heltec, Sunton, and Waveshare.",
+  "applicationCategory": "EmbeddedApplication",
+  "operatingSystem": "ESP32, ESP32-S3",
+  "url": "https://esp32dxcluster.hamradio.my/",
+  "downloadUrl": "https://esp32dxcluster.hamradio.my/",
+  "author": {
+    "@type": "Person",
+    "name": "9M2PJU",
+    "url": "https://github.com/9M2PJU"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "9M2PJU",
+    "url": "https://github.com/9M2PJU"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "softwareVersion": "1.0.0",
+  "featureList": [
+    "Browser-based web flasher (no software install)",
+    "Built-in web admin UI with captive portal",
+    "22 ESP32 boards supported with built-in displays",
+    "Live DX spots from any DXSpider cluster",
+    "Button command menu for cluster commands",
+    "Automatic Wi-Fi and telnet reconnect",
+    "UTC clock via NTP",
+    "Band colour coding",
+    "Adaptive UI for different screen sizes"
+  ],
+  "screenshot": "https://esp32dxcluster.hamradio.my/assets/logo.png"
+}
+</script>
+
+<!-- Structured data: FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a DX Cluster?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A DX Cluster is a network of servers that relay spots — real-time reports of interesting amateur radio activity. When someone hears a rare station, they post a spot to the cluster, and it's immediately distributed to all connected operators."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What ESP32 boards are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "22 boards are supported: LilyGO T-Display-S3, T-Display, T-QT, T-HMI, T-Watch 2020, T-Watch S3, T-Deck, M5Stack Core/Core2, M5StickC Plus, Sunton CYD, Waveshare S3 Round, Heltec WiFi Kit 32 (V1/V2/V3), WiFi LoRa 32 (V1/V2/V3), Wireless Stick, Wireless Stick Lite, and Wireless Tracker."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to install any software to flash the firmware?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The web flasher uses ESP Web Tools with Web Serial API. You just need Chrome, Edge, or Opera on desktop or Android. Plug in your ESP32 board via USB and click Install. No PlatformIO, no Arduino IDE, no drivers needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I change settings without re-flashing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Hold the BOOT button while pressing RESET to enter setup mode. The web admin UI lets you change Wi-Fi, callsign, cluster server, and all other settings. Changes are saved to NVS flash memory and persist across reboots."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What cluster servers can I use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Any DXSpider-compatible cluster that speaks the standard telnet protocol on port 7300. This includes DXSpider, CC Cluster, and AR-Cluster servers. The default host is 9m2pju.hamradio.my port 7300."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work with 5 GHz Wi-Fi?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The ESP32 only supports 2.4 GHz Wi-Fi (802.11 b/g/n). If your router is dual-band, connect to the 2.4 GHz network name."
+      }
+    }
+  ]
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0a0e1a;color:#e0e0e0;min-height:100vh;padding:20px;line-height:1.5}
