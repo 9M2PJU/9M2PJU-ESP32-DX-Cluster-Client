@@ -1,7 +1,7 @@
 # Display Mockups
 
 This document shows how the firmware renders on each category of display.
-The ESP32 DX Cluster Client supports 12 boards across 5 display layouts.
+The ESP32 DX Cluster Client supports 22 boards across 6 display layouts.
 All mockups are approximate — actual rendering uses anti-aliased fonts,
 colours, and animated elements described in the notes.
 
@@ -33,6 +33,9 @@ colours, and animated elements described in the notes.
 | Portrait tall | M5Stack Core / Core2, Sunton CYD | 240 x 320 | Scrolling list | 7 |
 | Small landscape | T-Display | 240 x 135 | Single spot | 1 |
 | Round / square | T-QT, Waveshare S3, T-Watch 2020/S3 | 128-240 sq | Compact | 1 |
+| OLED small | Heltec WiFi Kit 32 (all), WiFi LoRa 32 (all) | 128 x 64 | Compact | 1 |
+| OLED tiny | Heltec Wireless Stick / Stick Lite | 64 x 32 | Compact | 1 |
+| TFT small | Heltec Wireless Tracker, T-Deck | 160x80 / 320x240 | Compact / List | 1-5 |
 
 ---
 

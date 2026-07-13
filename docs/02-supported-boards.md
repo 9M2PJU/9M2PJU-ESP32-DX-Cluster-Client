@@ -1,6 +1,6 @@
 # Supported Boards
 
-> The 9M2PJU ESP32 DX Cluster Client runs on 12 popular ESP32 boards with a
+> The 9M2PJU ESP32 DX Cluster Client runs on 22 popular ESP32 boards with a
 > built-in screen. One PlatformIO environment is defined per board in
 > `platformio.ini`, and a matching LovyanGFX panel configuration lives in
 > `src/boards/`. Pick the environment that matches your hardware.
@@ -27,6 +27,13 @@ recommendations for which board to choose for different use cases.
   - [Waveshare ESP32-S3-Touch-LCD-1.28](#waveshare-esp32-s3-touch-lcd-128)
   - [LilyGO T-Watch 2020](#lilygo-t-watch-2020)
   - [LilyGO T-Watch S3](#lilygo-t-watch-s3)
+  - [LilyGO T-Deck](#lilygo-t-deck)
+  - [Heltec WiFi Kit 32 (V1/V2)](#heltec-wifi-kit-32-v1v2)
+  - [Heltec WiFi Kit 32 V3](#heltec-wifi-kit-32-v3)
+  - [Heltec WiFi LoRa 32 (V1/V2)](#heltec-wifi-lora-32-v1v2)
+  - [Heltec WiFi LoRa 32 V3](#heltec-wifi-lora-32-v3)
+  - [Heltec Wireless Stick / Stick Lite](#heltec-wireless-stick--stick-lite)
+  - [Heltec Wireless Tracker](#heltec-wireless-tracker)
 - [Choosing a board by use case](#choosing-a-board-by-use-case)
 - [How board support works](#how-board-support-works)
 
@@ -48,6 +55,16 @@ recommendations for which board to choose for different use cases.
 | `waveshare-s3-round` | Waveshare ESP32-S3-Touch-LCD-1.28 | ESP32-S3 | GC9A01 | 240x240 (round) | SPI | 8 MB | none | Round display; compact single-spot UI with connection ring |
 | `lilygo-t-watch-2020` | LilyGO T-Watch 2020 | ESP32 | ST7789 | 240x240 | SPI | 16 MB | none | AXP202 PMU init required for display power; wearable watch |
 | `lilygo-t-watch-s3` | LilyGO T-Watch S3 | ESP32-S3 | ST7789V3 | 240x240 | SPI | 16 MB | OPI PSRAM | AXP2101 PMU on board; backlight driven directly from GPIO 45 so no PMU init needed for display |
+| `lilygo-tdeck` | LilyGO T-Deck | ESP32-S3 | ST7789 | 320x240 | SPI | 16 MB | OPI PSRAM | Keyboard + trackball; peripheral power-enable on GPIO 10 |
+| `heltec-wifi-kit-32` | Heltec WiFi Kit 32 | ESP32 | SSD1306 | 128x64 | I2C | 4 MB | none | 0.96" OLED; SDA=4, SCL=15, RST=16 |
+| `heltec-wifi-kit-32-v2` | Heltec WiFi Kit 32 V2 | ESP32 | SSD1306 | 128x64 | I2C | 8 MB | none | 0.96" OLED; same pins as V1; 8 MB flash |
+| `heltec-wifi-kit-32-v3` | Heltec WiFi Kit 32 V3 | ESP32-S3 | SSD1306 | 128x64 | I2C | 8 MB | none | 0.96" OLED; SDA=17, SCL=18, RST=21; USB CDC |
+| `heltec-wifi-lora-32` | Heltec WiFi LoRa 32 | ESP32 | SSD1306 | 128x64 | I2C | 4 MB | none | 0.96" OLED + SX1276 LoRa (unused); same OLED pins as WiFi Kit 32 |
+| `heltec-wifi-lora-32-v2` | Heltec WiFi LoRa 32 V2 | ESP32 | SSD1306 | 128x64 | I2C | 8 MB | none | 0.96" OLED + SX1276 LoRa (unused); 8 MB flash |
+| `heltec-wifi-lora-32-v3` | Heltec WiFi LoRa 32 V3 | ESP32-S3 | SSD1306 | 128x64 | I2C | 8 MB | none | 0.96" OLED + SX1262 LoRa (unused); SDA=17, SCL=18, RST=21; USB CDC |
+| `heltec-wireless-stick` | Heltec Wireless Stick | ESP32 | SSD1306 | 64x32 | I2C | 8 MB | none | 0.49" OLED + SX1276 LoRa (unused); compact UI |
+| `heltec-wireless-stick-lite` | Heltec Wireless Stick Lite | ESP32 | SSD1306 | 64x32 | I2C | 4 MB | none | 0.49" OLED + SX1276 LoRa (unused); smallest screen |
+| `heltec-wireless-tracker` | Heltec Wireless Tracker | ESP32-S3 | ST7735 | 160x80 | SPI | 8 MB | none | 0.96" TFT + SX1262 LoRa + UC6580 GNSS (both unused); USB CDC |
 
 > **Don't see your board?** Adding a new board takes about 30 lines of code.
 > See [Adding a New Board](08-adding-new-board.md).
@@ -382,6 +399,183 @@ makes the boot path simpler than the 2020.
 
 ---
 
+### LilyGO T-Deck
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `lilygo-tdeck` |
+| Chip | ESP32-S3 |
+| Display controller | ST7789 |
+| Resolution | 320 x 240 |
+| Bus type | SPI |
+| Flash | 16 MB |
+| PSRAM | OPI PSRAM (`BOARD_HAS_PSRAM`) |
+| Build flag | `BOARD_LILYGO_TDECK` |
+| Board config | `src/boards/lilygo_tdeck.h` |
+
+**Notes:** The T-Deck is a pocket-sized companion with a 2.8" 320x240
+ST7789 display, a physical keyboard, and a trackball. It has a
+peripheral power-enable pin (GPIO 10) that must be set HIGH before the
+display receives power — the firmware handles this automatically via
+`initTDeckPower()` at boot. USB CDC and OPI PSRAM are enabled. The
+keyboard and trackball are not used by this firmware (the BOOT button
+is used for the command menu), but the form factor makes a nice
+self-contained desk gadget.
+
+**Best for:** A desk display with a premium form factor. The keyboard
+leaves room for future interactive features.
+
+---
+
+### Heltec WiFi Kit 32 (V1/V2)
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wifi-kit-32`, `heltec-wifi-kit-32-v2` |
+| Chip | ESP32 (classic) |
+| Display controller | SSD1306 |
+| Resolution | 128 x 64 |
+| Bus type | I2C (SDA=GPIO4, SCL=GPIO15, RST=GPIO16) |
+| Flash | 4 MB (V1) / 8 MB (V2) |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIFI_KIT_32` / `BOARD_HELTEC_WIFI_KIT_32_V2` |
+| Board config | `src/boards/heltec_oled_128x64.h` |
+
+**Notes:** The WiFi Kit 32 is Heltec's classic Wi-Fi-only board with a
+0.96" monochrome OLED. V1 has 4 MB flash; V2 has 8 MB. Both use the same
+I2C pinout for the OLED (SDA=4, SCL=15, RST=16, address 0x3C). The
+128x64 OLED uses the compact single-spot UI layout. No backlight pin —
+the OLED is always on.
+
+**Best for:** A minimal, low-cost OLED display. If you have a Heltec
+WiFi Kit 32 in your parts bin, this is the fastest way to get the
+firmware running on an OLED.
+
+---
+
+### Heltec WiFi Kit 32 V3
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wifi-kit-32-v3` |
+| Chip | ESP32-S3 |
+| Display controller | SSD1306 |
+| Resolution | 128 x 64 |
+| Bus type | I2C (SDA=GPIO17, SCL=GPIO18, RST=GPIO21) |
+| Flash | 8 MB |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIFI_KIT_32_V3` |
+| Board config | `src/boards/heltec_oled_128x64_v3.h` |
+
+**Notes:** The V3 switches from the classic ESP32 to the ESP32-S3, and
+the OLED I2C pins moved: SDA=17, SCL=18, RST=21 (different from V1/V2).
+USB CDC is enabled. The display is the same 0.96" 128x64 SSD1306 OLED.
+
+**Best for:** A modern Heltec OLED board with USB CDC and the S3's
+extra headroom.
+
+---
+
+### Heltec WiFi LoRa 32 (V1/V2)
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wifi-lora-32`, `heltec-wifi-lora-32-v2` |
+| Chip | ESP32 (classic) |
+| Display controller | SSD1306 |
+| Resolution | 128 x 64 |
+| Bus type | I2C (SDA=GPIO4, SCL=GPIO15, RST=GPIO16) |
+| Flash | 4 MB (V1) / 8 MB (V2) |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIFI_LORA_32` / `BOARD_HELTEC_WIFI_LORA_32_V2` |
+| Board config | `src/boards/heltec_oled_128x64.h` |
+
+**Notes:** The WiFi LoRa 32 is Heltec's popular LoRa board with the same
+0.96" 128x64 SSD1306 OLED as the WiFi Kit 32. It includes a SX1276 LoRa
+radio, but this firmware only uses Wi-Fi — the LoRa radio is unused. The
+OLED pinout is identical to the WiFi Kit 32 (SDA=4, SCL=15, RST=16).
+
+**Best for:** If you already have a WiFi LoRa 32 and want to use it as
+a DX cluster display. The LoRa radio is simply ignored.
+
+---
+
+### Heltec WiFi LoRa 32 V3
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wifi-lora-32-v3` |
+| Chip | ESP32-S3 |
+| Display controller | SSD1306 |
+| Resolution | 128 x 64 |
+| Bus type | I2C (SDA=GPIO17, SCL=GPIO18, RST=GPIO21) |
+| Flash | 8 MB |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIFI_LORA_32_V3` |
+| Board config | `src/boards/heltec_oled_128x64_v3.h` |
+
+**Notes:** The V3 upgrades to the ESP32-S3 and SX1262 LoRa radio. The
+OLED pins moved to SDA=17, SCL=18, RST=21 (same as WiFi Kit 32 V3). USB
+CDC is enabled. The LoRa radio is unused by this firmware.
+
+**Best for:** A modern Heltec LoRa board repurposed as a DX cluster
+display.
+
+---
+
+### Heltec Wireless Stick / Stick Lite
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wireless-stick`, `heltec-wireless-stick-lite` |
+| Chip | ESP32 (classic) |
+| Display controller | SSD1306 |
+| Resolution | 64 x 32 |
+| Bus type | I2C (SDA=GPIO4, SCL=GPIO15, RST=GPIO16) |
+| Flash | 8 MB (Stick) / 4 MB (Stick Lite) |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIRELESS_STICK` / `BOARD_HELTEC_WIRELESS_STICK_LITE` |
+| Board config | `src/boards/heltec_oled_64x32.h` |
+
+**Notes:** The Wireless Stick and Stick Lite are compact boards with a
+tiny 0.49" 64x32 OLED — the smallest screen in the supported set. They
+also include a SX1276 LoRa radio (unused). The 64x32 panel uses the
+compact single-spot UI. The SSD1306 controller's memory is 128x64, so
+the panel is configured with an offset (offset_x=32) to address the
+visible 64x32 region.
+
+**Best for:** A minimal, pocketable OLED display. The smallest form
+factor in the supported set.
+
+---
+
+### Heltec Wireless Tracker
+
+| Property | Value |
+| :--- | :--- |
+| Environment | `heltec-wireless-tracker` |
+| Chip | ESP32-S3 |
+| Display controller | ST7735 |
+| Resolution | 160 x 80 |
+| Bus type | SPI (MOSI=42, SCLK=41, DC=40, RST=39, CS=38) |
+| Flash | 8 MB |
+| PSRAM | none |
+| Build flag | `BOARD_HELTEC_WIRELESS_TRACKER` |
+| Board config | `src/boards/heltec_wireless_tracker.h` |
+
+**Notes:** The Wireless Tracker is the only Heltec board in the
+supported set with a color TFT display (ST7735, 160x80) instead of an
+OLED. It also includes a SX1262 LoRa radio and a UC6580 dual-frequency
+GNSS receiver — both unused by this firmware (Wi-Fi only). Uses
+`esp32-s3-devkitc-1` as the PlatformIO board definition since no
+official Heltec Wireless Tracker board ID exists. USB CDC is enabled.
+
+**Best for:** A compact color display with GPS capability for future
+features. The 160x80 panel is larger than the OLED boards but still
+uses the compact UI layout.
+
+---
+
 ## Choosing a board by use case
 
 Not sure which board to get? Here are recommendations based on how you
@@ -422,6 +616,8 @@ wrist. You want low cost and a compact panel.
 | Top pick | **LilyGO T-QT** (`lilygo-t-qt`) | Tiny, cheap, S3 |
 | Novelty pick | **Waveshare S3 Round** (`waveshare-s3-round`) | Round display, striking UI |
 | Lowest cost | **LilyGO T-Display** (`lilygo-tdisplay`) | Cheap, classic, easy to find |
+| OLED pick | **Heltec WiFi Kit 32 V3** (`heltec-wifi-kit-32-v3`) | 0.96" OLED, ESP32-S3, USB CDC |
+| Smallest | **Heltec Wireless Stick Lite** (`heltec-wireless-stick-lite`) | 0.49" OLED, tiny form factor |
 
 ---
 
@@ -441,11 +637,11 @@ Each board is defined in three places:
    rest of the firmware is board-agnostic.
 
 Because the UI code in `src/DxDisplay.cpp` talks to the LovyanGFX API and
-not to any specific panel, the same source compiles for all 12 boards.
+not to any specific panel, the same source compiles for all 22 boards.
 The display library, [LovyanGFX](https://github.com/lovyan03/LovyanGFX),
 is what makes this practical: a single library supports every controller
-we target (ST7789, ILI9341, GC9A01, RM67162, ST7789V3) across SPI,
-8-bit parallel, and QSPI buses with one unified API.
+we target (ST7789, ILI9341, GC9A01, RM67162, ST7789V3, SSD1306, ST7735)
+across SPI, 8-bit parallel, QSPI, and I2C buses with one unified API.
 
 To add a board that is not yet supported, see
 [Adding a New Board](08-adding-new-board.md).

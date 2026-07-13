@@ -4,7 +4,7 @@
   <img src="docs/assets/logo.png" alt="9M2PJU ESP32 DX Cluster Client" width="500">
 </p>
 
-> A single firmware that runs on **13 popular ESP32 boards with a built-in
+> A single firmware that runs on **22 popular ESP32 boards with a built-in
 > screen and Wi-Fi**, connects to any DXSpider-compatible DX cluster over
 > telnet, and shows live DX spots on the display — no computer required.
 
@@ -45,7 +45,7 @@ protocol on port 7300 (DXSpider, CC Cluster, AR-Cluster, etc.).
   connection needed after the first flash. Settings are stored in NVS
   (non-volatile storage) and survive reboots and firmware updates.
 
-- **13 boards supported** out of the box — LilyGO T-Display-S3, T-Display,
+- **22 boards supported** out of the box — LilyGO T-Display-S3, T-Display,
   T-QT, T-HMI, T-Watch 2020, T-Watch S3, T-Deck, M5Stack Core/Core2,
   M5StickC Plus, Sunton CYD, Waveshare S3 Round, and the T-Display-S3 AMOLED.
   Plus **9 Heltec boards** with OLED/TFT displays: WiFi Kit 32 (V1/V2/V3),
@@ -446,7 +446,7 @@ docs/
 
 The `.github/workflows/build-flash.yml` workflow:
 
-1. Builds all 13 board environments.
+1. Builds all 22 board environments.
 2. Packages the firmware binaries (bootloader, partitions, boot_app0, firmware).
 3. Creates ESP Web Tools manifest JSON files for each board.
 4. Publishes everything to GitHub Pages at
@@ -462,8 +462,8 @@ browser.
 
 This project uses [LovyanGFX](https://github.com/lovyan03/LovyanGFX) because a
 single library supports every display controller we target (ST7789, ILI9341,
-GC9A01, RM67162, ST7789V3) across SPI, 8-bit parallel, and QSPI buses, with
-one unified API.
+GC9A01, RM67162, ST7789V3, SSD1306, ST7735) across SPI, 8-bit parallel, QSPI,
+and I2C buses, with one unified API.
 
 ---
 
