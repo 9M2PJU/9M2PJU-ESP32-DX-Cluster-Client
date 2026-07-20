@@ -822,13 +822,13 @@ boards.forEach(b => {
 });
 </script>
 
-<!-- Install counter — counts real successful installs via counter.hamradio.my
+<!-- Install counter — counts real successful installs via stats.hamradio.my
      Cloudflare Worker (not blocked by ad blockers). Uses event delegation on
      document.body to catch the "closed" event from any dynamically-created
      esp-web-install-button dialog. Only increments when state === 'finished'. -->
 <script>
 (function() {
-  var API_BASE = 'https://counter.hamradio.my/esp32-dx-cluster';
+  var API_BASE = 'https://stats.hamradio.my/esp32-dx-cluster';
   var counterLabel = document.getElementById('counterLabel');
   function renderCount(n) {
     counterLabel.innerHTML = '<strong style="font-size:1.3em;color:#07b6d3;">' + n + '</strong> installs via this page';
