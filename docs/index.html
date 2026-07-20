@@ -237,6 +237,9 @@ a:hover{text-decoration:underline}
 <div class="badges">
 <img src="https://github.com/9M2PJU/9M2PJU-ESP32-DX-Cluster-Client/actions/workflows/build-flash.yml/badge.svg" alt="Build Status">
 </div>
+<div id="downloadCounter" style="margin-top:14px;font-size:.9rem;color:#64748b;">
+<span id="counterLabel">Loading install count&hellip;</span>
+</div>
 </header>
 
 <!-- =========================================================================
@@ -817,6 +820,34 @@ boards.forEach(b => {
   div.appendChild(btn);
   container.appendChild(div);
 });
+</script>
+
+<!-- Install counter — counts real successful installs via counter.hamradio.my
+     Cloudflare Worker (not blocked by ad blockers). Uses event delegation on
+     document.body to catch the "closed" event from any dynamically-created
+     esp-web-install-button dialog. Only increments when state === 'finished'. -->
+<script>
+(function() {
+  var API_BASE = 'https://counter.hamradio.my/esp32-dx-cluster';
+  var counterLabel = document.getElementById('counterLabel');
+  function renderCount(n) {
+    counterLabel.innerHTML = '<strong style="font-size:1.3em;color:#07b6d3;">' + n + '</strong> installs via this page';
+  }
+  fetch(API_BASE + '/')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { renderCount(data.count || 0); })
+    .catch(function() { counterLabel.textContent = ''; });
+  document.body.addEventListener('closed', function(e) {
+    var dialog = e.target;
+    var state = dialog && dialog._installState;
+    if (state && state.state === 'finished') {
+      fetch(API_BASE + '/up')
+        .then(function(r) { return r.json(); })
+        .then(function(data) { renderCount(data.count || 0); })
+        .catch(function() {});
+    }
+  });
+})();
 </script>
 </body>
 </html>
