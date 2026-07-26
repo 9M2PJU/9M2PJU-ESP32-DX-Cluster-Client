@@ -531,7 +531,7 @@ If you find this project useful, consider supporting its development:
 <p align="center">
   <a href="https://buymeacoffee.com/9m2pju"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee"></a>
   &nbsp;
-  <a href="https://paypal.me/9m2pju"><img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal"></a>
+  <a href="https://wise.com/pay/me/faizulz13"><img src="https://img.shields.io/badge/Wise-%40faizulz13-006666?style=for-the-badge&logo=wise&logoColor=white" alt="Wise"></a>
 </p>
 
 ---
